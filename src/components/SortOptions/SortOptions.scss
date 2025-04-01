@@ -1,0 +1,28 @@
+// src/components/SortOptions/SortOptions.scss
+
+.sort-options {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px; // Khoảng cách với grid truyện
+  
+    label {
+      font-size: 0.9em;
+      color: #495057;
+    }
+  
+    select {
+      padding: 6px 10px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 0.9em;
+      background-color: #fff;
+      cursor: pointer;
+  
+       &:focus {
+          outline: none;
+          border-color: #80bdff;
+          box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+    }
+  }

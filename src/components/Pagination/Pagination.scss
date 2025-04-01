@@ -1,0 +1,47 @@
+// src/components/Pagination/Pagination.scss
+
+.pagination-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px; // Khoảng cách với grid truyện
+    gap: 5px; // Khoảng cách giữa các nút
+  
+    .page-button {
+      padding: 8px 12px;
+      border: 1px solid #dee2e6;
+      background-color: #fff;
+      color: #007bff;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 0.9em;
+      transition: background-color 0.2s, color 0.2s;
+  
+      &:hover:not(:disabled):not(.active) {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+      }
+  
+      &:disabled {
+        color: #6c757d;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+  
+      &.active {
+        background-color: #007bff;
+        color: #fff;
+        border-color: #007bff;
+        cursor: default;
+      }
+  
+      &.prev, &.next {
+          // Có thể thêm style riêng nếu muốn
+      }
+    }
+  
+    .page-ellipsis {
+       padding: 8px 5px;
+       color: #6c757d;
+    }
+  }

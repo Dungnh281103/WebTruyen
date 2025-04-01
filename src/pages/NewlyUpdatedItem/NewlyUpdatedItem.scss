@@ -1,0 +1,82 @@
+/* NewlyUpdatedItem.scss */
+.newly-updated-item {
+    display: grid;
+    grid-template-columns: 0.8fr 2.5fr 1fr 1.2fr 0.5fr;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+    
+    &:nth-child(even) {
+      background-color: #f8f8f8;
+    }
+    
+    .genre-section {
+      width: 120px;
+      padding-left: 15px;
+      flex-shrink: 0;
+    }
+    
+    
+    
+    .title-section {
+      flex-grow: 1;
+      min-width: 0;
+      padding: 0 10px;
+      font-size: 16px;
+    }
+    
+    .story-title {
+      color: #444;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: normal;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+      
+      &:hover {
+        color: #b78a28;
+      }
+    }
+    
+    .author-section {
+      width: 150px;
+      flex-shrink: 0;
+      padding: 0 10px;
+    }
+    
+    .author {
+      color: #777;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+    
+    .chapter-section {
+      width: 120px;
+      flex-shrink: 0;
+      padding: 0 10px;
+    }
+    
+    .chapter-link {
+      color: #666;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+    
+    .time-section {
+      width: 100px;
+      flex-shrink: 0;
+      text-align: right;
+      padding-right: 15px;
+    }
+    
+    .time-ago {
+      color: #999;
+    }
+  }

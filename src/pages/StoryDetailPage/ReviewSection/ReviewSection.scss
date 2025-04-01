@@ -1,0 +1,23 @@
+.review-section {
+    margin-top: 20px;
+  
+    .review-item {
+      border: 1px solid #eee;
+      padding: 10px;
+      margin-bottom: 10px;
+  
+      .review-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+      }
+  
+      .user {
+        font-weight: bold;
+      }
+  
+      .rating {
+        color: #777;
+      }
+    }
+  }

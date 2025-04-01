@@ -1,0 +1,20 @@
+.chapter-reader-page {
+    padding: 20px;
+
+    .reader-header {
+        text-align: center;
+        margin-bottom: 20px;
+
+        .reader-actions {
+            margin-top: 10px;
+        }
+    }
+
+    .reader-content {
+        .chapter-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+    }
+}

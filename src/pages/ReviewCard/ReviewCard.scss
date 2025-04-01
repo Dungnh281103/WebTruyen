@@ -1,0 +1,58 @@
+.review-card {
+    border: 1px solid #eee;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+
+    .review-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .review-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .review-username {
+        margin-right: auto;
+    }
+
+    .review-time {
+        color: grey;
+        font-size: small;
+    }
+
+    .review-details {
+        margin-bottom: 10px;
+    }
+
+    .review-stars {
+        color: #ffc107;
+    }
+
+    .review-story-link {
+        font-weight: bold;
+        margin-left: 10px;
+        text-decoration: none;
+        color: inherit;
+        display: inline-flex; // để align ảnh và text trên cùng hàng
+        align-items: center; // chỉnh để align ảnh và text trên cùng hàng
+
+        .review-story-thumb {
+            width: 20px;
+            height: auto;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+    }
+
+    .review-snippet {
+        margin: 0;
+        font-style: italic;
+        color: #555;
+    }
+}

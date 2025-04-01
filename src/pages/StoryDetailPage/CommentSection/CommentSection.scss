@@ -1,0 +1,123 @@
+.comment-section {
+    padding: 20px;
+    border-radius: 15px;
+    // background-color: #f5f5f5;
+    border: 1px solid #ccc;
+
+  .comment-tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+
+      button {
+          padding: 10px 15px;
+          border: none;
+          background-color: #f0f0f0;
+          cursor: pointer;
+
+          &.active {
+              background-color: #ddd;
+              font-weight: bold;
+          }
+
+          &:first-child {
+              border-radius: 8px 0 0 0;
+          }
+
+          &:last-child {
+              border-radius: 0 8px 0 0;
+          }
+      }
+  }
+
+  .comment-form {
+      border-bottom: 1px solid #eee;
+      padding-bottom: 20px;
+
+      input[type="range"] {
+          width: 100%;
+      }
+
+      input[type="text"],
+      textarea {
+          width: 100%;
+          padding: 10px;
+          margin-bottom: 10px;
+          border: 1px solid #ccc;
+      }
+
+      button {
+          background-color: #007bff;
+          color: white;
+          padding: 10px 15px;
+          border: none;
+          cursor: pointer;
+      }
+
+      .comment-notice {
+          margin-top: 10px;
+          font-size: 0.9em;
+          color: #777;
+      }
+  }
+
+  .comment-list {
+      margin-top: 20px;
+
+      .comment-item {
+          border-bottom: 1px solid #eee;
+          padding: 10px;
+          margin-bottom: 10px;
+
+          .comment-header {
+              display: flex;
+              justify-content: flex-start; /* căn trái các phần tử */
+              margin-bottom: 5px;
+          }
+
+          .user {
+              font-weight: bold;
+              margin-right: 5px;
+          }
+
+          .comment-text {
+              margin-top: 5px;
+          }
+      }
+
+      .comment-input {
+          textarea {
+              width: 100%;
+              padding: 10px;
+              margin-bottom: 10px;
+              border: 1px solid #ccc;
+          }
+
+          button {
+              background-color: #007bff;
+              color: white;
+              padding: 10px 15px;
+              border: none;
+              cursor: pointer;
+          }
+      }
+  }
+
+  .comment-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+
+      button {
+          padding: 10px 15px;
+          border: none;
+          background-color: #f0f0f0;
+          cursor: pointer;
+      }
+      span {
+          font-size: 0.9rem;
+          color: #777;
+      }
+  }
+}

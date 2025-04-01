@@ -1,0 +1,188 @@
+// AuthModal.scss
+@import 'bootstrap/scss/bootstrap';
+
+// Custom variables based on the screenshot
+$primary-color: #f08c00; // Changed to match your theme color
+$btn-hover-color: #d67e00;
+$text-color: #333333;
+$link-color: #f08c00;
+
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.7); // Darkened background
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1040;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-modal {
+  .modal-content {
+    border-radius: 6px;
+    border: none;
+    background-color: #ffffff; // Ensure solid background
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); // Stronger shadow
+    max-width: 450px;
+    margin: 0 auto;
+  }
+
+  .modal-dialog {
+    margin: 1.75rem auto;
+  }
+
+  .modal-header {
+    justify-content: flex-end;
+    padding: 1rem 1rem 0;
+    border-bottom: none;
+  }
+
+  .modal-body {
+    padding: 1.5rem 2rem 2rem;
+  }
+
+  .modal-logo {
+    max-width: 80px;
+    margin-bottom: 1rem;
+  }
+
+  .modal-title {
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: $text-color;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-control {
+    height: auto;
+    padding: 12px 15px;
+    border-radius: 4px;
+    border: 1px solid #d8d8d8;
+    background-color: #f8f8f8; // Light background for inputs
+    font-size: 15px;
+    
+    &:focus {
+      box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25);
+      border-color: $primary-color;
+      background-color: #ffffff; // White background on focus
+    }
+  }
+
+  .auth-buttons {
+    margin-top: 1.5rem;
+    
+    .btn {
+      padding: 0.6rem 1.25rem;
+      font-weight: 500;
+      border-radius: 4px;
+    }
+  }
+
+  .btn-login {
+    background-color: $primary-color;
+    border-color: $primary-color;
+    color: #ffffff;
+    
+    &:hover, &:focus, &:active {
+      background-color: $btn-hover-color !important;
+      border-color: $btn-hover-color !important;
+      box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25) !important;
+    }
+  }
+
+  .btn-register {
+    color: $primary-color;
+    border-color: $primary-color;
+    background-color: transparent;
+    
+    &:hover, &:focus, &:active {
+      background-color: $primary-color !important;
+      border-color: $primary-color !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25) !important;
+    }
+  }
+
+  .toggle-auth {
+    font-size: 14px;
+    color: #666;
+    margin: 1.25rem 0 0.5rem;
+    cursor: pointer;
+    
+    &:hover {
+      color: $primary-color;
+      text-decoration: underline;
+    }
+  }
+
+  .forgot-password {
+    font-size: 14px;
+    color: #999;
+    cursor: pointer;
+    
+    &:hover {
+      color: $primary-color;
+      text-decoration: underline;
+    }
+  }
+
+  .close {
+    font-size: 1.5rem;
+    color: #aaa;
+    opacity: 1;
+    padding: 0;
+    margin: 0;
+    
+    &:hover {
+      color: #666;
+    }
+  }
+
+  // Add additional Bootstrap 4 specific fixes
+  .d-block {
+    display: block !important;
+  }
+
+  .text-center {
+    text-align: center !important;
+  }
+
+  .d-flex {
+    display: flex !important;
+  }
+
+  .flex-fill {
+    flex: 1 1 auto !important;
+  }
+
+  .mr-2 {
+    margin-right: 0.5rem !important;
+  }
+
+  .mb-3 {
+    margin-bottom: 1rem !important;
+  }
+
+  .mb-4 {
+    margin-bottom: 1.5rem !important;
+  }
+
+  .mt-3 {
+    margin-top: 1rem !important;
+  }
+
+  .mt-4 {
+    margin-top: 1.5rem !important;
+  }
+
+  .pb-5 {
+    padding-bottom: 3rem !important;
+  }
+}

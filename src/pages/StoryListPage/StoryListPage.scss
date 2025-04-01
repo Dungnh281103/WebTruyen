@@ -1,0 +1,64 @@
+// src/pages/StoryListPage/StoryListPage.scss
+
+.story-list-page {
+    max-width: 1400px; // Độ rộng tối đa của trang
+    margin: 20px auto; // Căn giữa và khoảng cách trên dưới
+    padding: 0 20px; // Padding hai bên
+  
+    .main-content {
+      display: grid; // Sử dụng grid cho layout 2 cột
+      grid-template-columns: 240px 1fr; // Sidebar 240px, phần còn lại cho content
+      gap: 25px; // Khoảng cách giữa sidebar và content
+  
+      @media (max-width: 992px) { // Responsive: Chuyển thành 1 cột trên màn hình nhỏ hơn
+        grid-template-columns: 1fr; // Chỉ còn 1 cột
+        .filter-sidebar {
+            margin-bottom: 20px; // Khoảng cách khi filter nằm trên
+            // Hoặc bạn có thể ẩn filter vào 1 nút bấm
+        }
+      }
+    }
+  
+    .filter-sidebar {
+      // Style cho khu vực chứa FilterPanel
+    }
+  
+    .story-display-area {
+      // Khu vực chứa sort, grid, pagination
+    }
+  
+    .controls-bar {
+        // Chứa SortOptions, có thể thêm các element khác
+        display: flex;
+        justify-content: flex-end; // Đẩy sort sang phải (hoặc space-between nếu có element khác)
+        align-items: center;
+    }
+  
+  
+    .loading-indicator {
+      text-align: center;
+      padding: 50px;
+      font-size: 1.2em;
+      color: #6c757d;
+    }
+  
+    .error-message {
+      text-align: center;
+      padding: 50px;
+      color: #dc3545;
+      border: 1px solid #f5c6cb;
+      background-color: #f8d7da;
+      border-radius: 5px;
+    }
+  
+    .no-stories-found {
+       text-align: center;
+       padding: 50px;
+       color: #6c757d;
+    }
+  }
+  
+  // Import các file SCSS của component con nếu cần thiết kế tập trung
+  // @import '../../components/FilterPanel/FilterPanel.scss';
+  // @import '../../components/SortOptions/SortOptions.scss';
+  // ...

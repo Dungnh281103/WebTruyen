@@ -1,0 +1,54 @@
+.site-footer {
+     /* Màu chữ nhạt */
+    padding: 30px 0;
+    margin-top: 40px; /* Khoảng cách với nội dung bên trên */
+    font-size: 0.9em;
+    border-top: 1px solid #ccc; /* Đường viền trên */
+  }
+  
+  .footer-container {
+    /* max-width: 1200px; */ /* Bỏ hoặc comment dòng này */
+    /* margin: 0 auto; */    /* Bỏ hoặc comment dòng này */
+    margin-left: 195px;  /* Thêm margin trái */
+    margin-right: 195px; /* Thêm margin phải */
+    padding: 0; /* Bỏ padding ngang cũ nếu có */
+    text-align: center;
+  }
+  
+  .footer-links {
+    margin-bottom: 15px;
+  }
+  
+  .footer-links a {
+    color: black; /* Màu link nhạt hơn */
+    text-decoration: none;
+    margin: 0 10px; /* Khoảng cách giữa các link */
+    transition: color 0.2s ease;
+  }
+  
+  .footer-links a:hover {
+/* Sáng lên khi hover */
+    text-decoration: underline;
+  }
+  
+  .footer-copyright {
+    margin-bottom: 10px;
+  }
+   .footer-copyright p {
+       margin: 5px 0 0 0;
+       font-size: 0.85em;
+   }
+
+
+   .footer-logo {
+    text-align: center; /* Căn giữa logo */ 
+    margin: 5px;
+  }
+  .footer-logo a {
+    display: inline-block;
+  }
+  .footer-logo img {
+    height: 35px; 
+    display: block;
+  
+  }
