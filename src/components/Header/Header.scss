@@ -121,24 +121,59 @@
   }
   
   /* Auth links khi chưa đăng nhập (nếu cần giữ lại) */
-  .auth-links {
-      display: flex;
-      align-items: center;
-
-      button {
-        margin: 0 5px;
-        
+  // SCSS for auth buttons
+// SCSS for auth buttons with yellow color scheme
+.auth-links {
+  display: flex;
+  align-items: center;
+  
+  .auth-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
+    font-size: 15px;
+    font-weight: 400;
+    transition: all 0.3s ease;
+    
+    i {
+      font-size: 1.1rem;
+      
+    }
+    
+    &.login-btn {
+      background-color: transparent;
+      
+      border: 1px solid #ffc107;
+      margin-right: 2px;
+      
+      &:hover {
+        background-color: darken(#ffc107, 8%);
       }
     }
-    .auth-links a {
-    margin-left: 15px;
-    text-decoration: none;
-    color: #555;
-    font-size: 0.95em;
+    
+    &.register-btn {
+      background-color: #c18a28;
+      color: white;
+      border: 1px solid #c18a28;
+      
+      &:hover {
+        background-color: darken(#ffc107, 8%);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+    }
   }
-  .auth-links a:hover {
-    color: #00000096;
+  
+  @media (max-width: 576px) {
+    .auth-btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
   }
+}
+    
+  
   
   /* Dropdown menu (giữ nguyên hoặc chỉnh sửa style nếu cần) */
   .user-dropdown-menu {

@@ -1,0 +1,98 @@
+// SCSS for Login Form
+.login-form {
+    padding: 1.5rem;
+    
+    .custom-input {
+      height: 48px;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      
+      &:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+      }
+    }
+    
+    .input-group {
+      position: relative;
+      
+      .toggle-password-btn {
+        background: transparent;
+        border: none;
+        color: #6c757d;
+        height: 48px;
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+        border: 1px solid #e0e0e0;
+        border-left: none;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          color: #ffc107;
+        }
+        
+        &:focus {
+          outline: none;
+          box-shadow: none;
+        }
+      }
+    }
+    
+    .login-btn {
+      background-color: #ffc107;
+      color: white;
+      font-weight: 500;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      border: none;
+      transition: all 0.3s ease;
+      height: 48px;
+      
+      &:hover {
+        background-color: darken(#ffc107, 10%);
+        box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+      }
+      
+      &:focus {
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+        outline: none;
+      }
+    }
+    
+    .forgot-password {
+      color: #6c757d;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      
+      &:hover {
+        color: #ffc107;
+      }
+    }
+    
+    .toggle-form {
+      color: #6c757d;
+      font-size: 0.9rem;
+      
+      span {
+        color: #ffc107;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          color: darken(#ffc107, 10%);
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+  
+  // Add this to your global styles if needed
+  .form-control:focus {
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+  }

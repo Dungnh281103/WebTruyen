@@ -2,7 +2,7 @@
 import React from 'react';
 import './FilterPanel.scss';
 
-// Dữ liệu mẫu cho các lựa chọn filter (nên lấy từ API hoặc cấu hình)
+
 const genreOptions = ["Tất cả", "Tiên Hiệp", "Huyền Huyễn", "Đô Thị", "Ngôn Tình", "Khoa Huyễn", "Lịch Sử"];
 const statusOptions = ["Tất cả", "Đang ra", "Hoàn thành"];
 const chapterOptions = ["Tất cả", "Dưới 100", "100-500", "500-1000", "Trên 1000"];
@@ -14,7 +14,6 @@ function FilterPanel({ currentFilters, onFilterChange }) {
     onFilterChange({ [name]: value === 'Tất cả' ? '' : value }); // Nếu chọn "Tất cả" thì gửi giá trị rỗng
   };
 
-  // Thêm các handler khác cho checkbox, input number nếu cần
 
   return (
     <div className="filter-panel">

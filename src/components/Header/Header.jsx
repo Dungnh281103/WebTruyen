@@ -1,21 +1,103 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaSearch, FaUserCircle } from 'react-icons/fa';
 import logo from '../../assets/img/logo.png';
 import './Header.scss';
-import AuthModal from '../Auth/LoginModal';// Import AuthModal
+import AuthModal from '../Auth/LoginModal';
+import UserMenu from './UserMenu/UserMenu';
 
 function Header() {
-  const isLoggedIn = false;
-  const user = isLoggedIn ? { username: 'DemoUser', avatarUrl: null } : null;
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
-  const [isUserMenuVisible, setIsUserMenuVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [initialAuthMode, setInitialAuthMode] = useState('login');
+  
   const navigate = useNavigate();
-  const userMenuRef = useRef(null);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false); // State cho modal đăng nhập/đăng ký
-  const [isLoginModal, setIsLoginModal] = useState(true); // State xác định modal đăng nhập hay đăng ký
+
+  useEffect(() => {
+    checkUserLoginStatus();
+  }, []);
+  
+ 
+  const logout = () => {
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userData');
+    setIsLoggedIn(false);
+    setUser(null);
+  };
+  
+  const checkUserLoginStatus = () => {
+    const userToken = localStorage.getItem('userToken');
+    if (userToken) {
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        setUser(JSON.parse(userData));
+        setIsLoggedIn(true);
+      } else {
+        
+        fetchUserData();
+      }
+    } else {
+      setIsLoggedIn(false);
+      setUser(null);
+    }
+  };
+  
+  const fetchUserData = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        logout();
+        return;
+      }
+      
+      try {
+      
+        const response = await fetch('/data/users.json');
+        if (!response.ok) throw new Error('Failed to fetch user data');
+        
+        const data = await response.json();
+        const userData = data.users.find(u => u.id === userId);
+        
+        if (!userData) {
+          logout();
+          return;
+        }
+        
+        const { password, ...safeUserData } = userData;
+        
+    
+        if (!safeUserData.display_name && safeUserData.displayName) {
+          safeUserData.display_name = safeUserData.displayName;
+        }
+        
+        if (!safeUserData.avatar_url && safeUserData.avatar) {
+          safeUserData.avatar_url = safeUserData.avatar;
+        }
+        
+   
+        localStorage.setItem('userData', JSON.stringify(safeUserData));
+        setUser(safeUserData);
+        setIsLoggedIn(true);
+      } catch (error) {
+        console.warn('Failed to fetch from API, trying localStorage');
+        const userData = localStorage.getItem('userData');
+        if (userData) {
+          setUser(JSON.parse(userData));
+          setIsLoggedIn(true);
+        } else {
+          logout();
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+      logout();
+    }
+  };
 
   const handleSearchSubmit = (event) => {
     if (event.key === 'Enter' && searchTerm.trim()) {
@@ -25,27 +107,20 @@ function Header() {
     }
   };
 
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
-        setIsUserMenuVisible(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [userMenuRef]);
-
   const handleLogout = () => {
-    setIsUserMenuVisible(false);
-    alert('Đăng xuất thành công (Demo)');
+    logout();
     navigate('/');
   };
 
-  const openAuthModal = (isLogin) => {
-    setIsLoginModal(isLogin);
+  const openAuthModal = (mode) => () => {
+    setInitialAuthMode(mode);
     setIsAuthModalOpen(true);
+  };
+
+  const handleAuthSuccess = (userData) => {
+    setIsAuthModalOpen(false);
+    setUser(userData);
+    setIsLoggedIn(true);
   };
 
   return (
@@ -80,59 +155,26 @@ function Header() {
 
         <div className="header-user-actions">
           {isLoggedIn && user ? (
-            <div className="user-menu-container" ref={userMenuRef}>
-              <button
-                className="user-avatar-btn"
-                onClick={() => setIsUserMenuVisible(!isUserMenuVisible)}
-                aria-label="Menu người dùng"
-              >
-                {user.avatarUrl ? (
-                  <img src={user.avatarUrl} alt={user.username} className="user-avatar-img" />
-                ) : (
-                  <FaUserCircle className="user-avatar-icon" />
-                )}
-              </button>
-              {isUserMenuVisible && (
-                <ul className="user-dropdown-menu">
-                  <li>
-                    <Link to="/tu-truyen" onClick={() => setIsUserMenuVisible(false)}>
-                      Tủ truyện
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/lich-su-doc" onClick={() => setIsUserMenuVisible(false)}>
-                      Lịch sử đọc
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/tai-khoan" onClick={() => setIsUserMenuVisible(false)}>
-                      Tài khoản
-                    </Link>
-                  </li>
-                  <li>
-                    <hr />
-                  </li>
-                  <li>
-                    <button onClick={handleLogout} className="logout-button">
-                      Đăng xuất
-                    </button>
-                  </li>
-                </ul>
-              )}
-            </div>
+            <UserMenu user={user} onLogout={handleLogout} />
           ) : (
             <div className="auth-links">
-              <button className="auth-link login-link" onClick={() => openAuthModal(true)}>
+              <button className="btn auth-btn login-btn" onClick={openAuthModal('login')}>
                 Đăng nhập
               </button>
-              <button className="auth-link register-link" onClick={() => openAuthModal(false)}>
+              <button className="btn auth-btn register-btn" onClick={openAuthModal('register')}>
                 Đăng ký
               </button>
             </div>
           )}
         </div>
       </div>
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} isLogin={isLoginModal}/>
+      
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)}
+        onAuthSuccess={handleAuthSuccess}
+        initialMode={initialAuthMode}
+      />
     </header>
   );
 }

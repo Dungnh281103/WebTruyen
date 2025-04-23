@@ -1,18 +1,42 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './StoryCard.scss';
 
 function StoryCard({ story }) {
+  // Make sure it has this link structure
+  const storyUrl = story.id ? `/story/${story.id}` : '#';
+  
+  // Format view count with thousands separator
+  const formattedViews = story.total_views ? 
+    story.total_views.toLocaleString() : 
+    (story.views ? story.views.toLocaleString() : '0');
+  
+  // Get status with proper formatting
+  const status = story.status === 'completed' ? 'Hoàn thành' : 
+                (story.status === 'ongoing' ? 'Đang ra' : story.status);
+
   return (
-    <Link to={story.url || '#'} style={{ textDecoration: 'none', color: 'inherit', border: '1px solid #ddd', display: 'block', borderRadius: '4px', overflow: 'hidden' }}>
-      <img src={story.imageUrl || '/images/placeholder.png'} alt={story.title} style={{ width: '100%', height: '150px', objectFit: 'cover', display: 'block' }} />
-      <div style={{ padding: '8px' }}>
-        <h4 style={{ margin: '0 0 5px 0', fontSize: '1em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{story.title}</h4>
-        {/* Thêm các thông tin khác nếu cần (chương mới, lượt xem...) */}
-        {story.latestChapter && <p style={{ margin: 0, fontSize: '0.9em', color: 'grey' }}>{story.latestChapter}</p>}
-        {story.views && <p style={{ margin: 0, fontSize: '0.9em', color: 'grey' }}>Views: {story.views}</p>}
-        {story.status && <p style={{ margin: 0, fontSize: '0.9em', color: 'green' }}>{story.status}</p>}
-      </div>
-    </Link>
+    <div className="story-card">
+      <Link to={storyUrl} className="story-link">
+        <div className="image-container">
+          <img 
+            src={story.cover_url || story.imageUrl || '/images/placeholder.png'} 
+            alt={story.title} 
+            className="story-image"
+          />
+          <div className="story-views">
+            <i className="fas fa-eye"></i> {formattedViews}
+          </div>
+          {status && <div className={`story-status ${story.status}`}>{status}</div>}
+        </div>
+        <div className="story-info">
+          <h3 className="story-title">{story.title}</h3>
+          {story.author && <p className="story-author">{story.author}</p>}
+          {story.latestChapter && <p className="latest-chapter">{story.latestChapter}</p>}
+        </div>
+      </Link>
+    </div>
   );
 }
+
 export default StoryCard;

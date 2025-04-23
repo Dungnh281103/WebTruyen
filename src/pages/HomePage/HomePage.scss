@@ -14,33 +14,9 @@
   }
   
   /* --- Section Title --- */
-  .section-title-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #eee; /* Border rõ hơn */
-    padding-bottom: 8px;
-    color: #b78a28;
-    font-size: 12px;
-  }
   
-  .section-title-container h2 {
-    margin: 0;
-    font-size: 1.6em; /* Tăng kích thước tiêu đề */
-    font-weight: 600;
-  }
   
-  /* .section-title-container a {
-    text-decoration: none;
-    color: #b78a28;
-    font-weight: 100;
-    transition: color 0.2s ease;
-  }
-   */
-  .section-title-container a:hover {
-    color: #0056b3;
-  }
+  
   
   
   /* --- Story Grid (Truyện Hot, Đề Cử, Hoàn Thành) --- */

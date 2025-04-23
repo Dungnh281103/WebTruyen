@@ -1,97 +1,163 @@
-/* DetailedStoryItem.css */
-
 .detailed-story-item {
-    display: flex; /* Bố cục flex: ảnh trái, text phải */
-    gap: 15px; /* Khoảng cách giữa ảnh và text */
-    border: 1px solid #e8e8e8; /* Border nhẹ */
-    border-radius: 4px;
-    padding: 15px;
-    background-color: #fff;
-    transition: box-shadow 0.2s ease;
+  display: flex;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 0;
+  height: 100%;
+  transition: transform 0.2s, box-shadow 0.2s;
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   }
   
-  .detailed-story-item:hover {
-     box-shadow: 0 3px 8px rgba(0,0,0,0.07);
+  &__image-link {
+    flex: 0 0 120px;
+    width: 120px;
+    overflow: hidden;
+    
+    @media (max-width: 576px) {
+      flex: 0 0 100px;
+      width: 100px;
+    }
   }
   
-  
-  .detailed-story-item__image-link {
-    flex-shrink: 0; /* Không co ảnh lại */
-  }
-  
-  .detailed-story-item__image {
-    width: 80px; /* Độ rộng cố định cho ảnh bìa */
-    height: auto;
-    aspect-ratio: 3 / 4; /* Giữ tỉ lệ ảnh bìa */
+  &__image {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    border-radius: 3px;
-    display: block;
+    transition: transform 0.3s;
+    
+    &:hover {
+      transform: scale(1.05);
+    }
   }
   
-  .detailed-story-item__content {
+  &__content {
+    flex: 1;
+    padding: 15px;
     display: flex;
-    flex-direction: column; /* Xếp các element text theo chiều dọc */
-    flex-grow: 1; /* Chiếm hết không gian còn lại */
-    overflow: hidden; /* Ngăn nội dung tràn ra */
+    flex-direction: column;
   }
   
-  .detailed-story-item__title {
-    margin: 0 0 8px 0;
-    font-size: 1.1em; /* Size chữ tiêu đề */
+  &__title {
+    margin: 0 0 10px;
+    font-size: 1.1rem;
     font-weight: 600;
-    /* Giới hạn 1-2 dòng */
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .detailed-story-item__title a {
+    line-height: 1.3;
+    
+    a {
+      color: #333;
       text-decoration: none;
-      color: inherit; /* Màu chữ giống cha */
+      transition: color 0.2s;
+      
+      &:hover {
+        color: #f08c00;
+      }
+    }
   }
-   .detailed-story-item__title a:hover {
-      color: #b78a28;
-   }
   
-  
-  .detailed-story-item__synopsis {
-    margin: 0 0 10px 0;
-    font-size: 0.9em;
+  &__synopsis {
+    margin: 0 0 12px;
+    font-size: 0.9rem;
     color: #666;
-    /* Giới hạn 2-3 dòng */
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3; /* Giới hạn 3 dòng */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.4; /* Giãn dòng dễ đọc */
+    line-height: 1.4;
+    flex-grow: 1;
+    
+    @media (max-width: 768px) {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
   }
   
-  .detailed-story-item__meta {
-    margin-top: auto; /* Đẩy meta xuống dưới cùng */
+  &__meta {
     display: flex;
-    justify-content: space-between; /* Căn tác giả trái, thể loại phải */
+    flex-wrap: wrap;
+    justify-content: space-between;
     align-items: center;
-    font-size: 0.85em;
-    color: #888;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    color: #666;
+    gap: 12px;
+    
+    .icon {
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+  }
+
+  &__author{
+    cursor: pointer;
+    &:hover{
+      color: #b88c2c;
+    }
   }
   
-  .detailed-story-item__author {
-    display: flex; /* Để icon và text căn giữa */
+  &__genre {
+    background-color: #f5f5f5;
+    border-radius: 12px;
+    padding: 3px 10px;
+    color: #b88c2c;
+    font-size: 0.8rem;
+    display: inline-flex;
     align-items: center;
+    border: 1px solid #b88c2c;
   }
   
-  /* Style cho genre badge (tái sử dụng từ HomePage.css nếu có) */
-  .detailed-story-item__genre.genre-badge {
-    // background-color: #f0f0f0;
-    padding: 3px 8px;
-    border-radius: 10px; /* Bo tròn hơn */
-    font-size: 0.8em;
-    color: #b78a28;
-    border: 1px solid #b78a28;
+  &__actions {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+    
+    .btn {
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.2s;
+      
+      .icon {
+        margin-right: 5px;
+      }
+    }
+    
+    .btn-outline {
+      color: #666;
+      border: 1px solid #ddd;
+      
+      &:hover {
+        background-color: #f5f5f5;
+        border-color: #ccc;
+      }
+    }
+    
+    .btn-primary {
+      background-color: #f08c00;
+      color: white;
+      border: 1px solid #f08c00;
+      
+      &:hover {
+        background-color: #e07d00;
+      }
+    }
   }
-  /* Ví dụ thêm màu cho các thể loại khác nhau nếu cần */
-  .detailed-story-item__genre.genre-badge--tien-hiep { background-color: #e7f5ff; border-color: #b3dfff; color: #005cb3;}
-  .detailed-story-item__genre.genre-badge--do-thi { background-color: #fff0e6; border-color: #ffd1b3; color: #b35f00;}
-  /* ... Thêm các màu khác ... */   
+  
+  @media (max-width: 576px) {
+    flex-direction: column;
+    
+    &__image-link {
+      width: 100%;
+      height: 180px;
+    }
+    
+    &__actions {
+      flex-direction: column;
+    }
+  }
+}

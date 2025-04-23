@@ -1,194 +1,315 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import './StoryDetailPage.scss'; // Import file SCSS
-import ChapterListItem from '../../components/ChapterListItem/ChapterListItem';
-import RatingStars from './RatingStars/RatingStars';
-import CommentSection from './CommentSection/CommentSection';
+import React, { useEffect, useState } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import './StoryDetailPage.scss';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
-import { Link } from 'react-router-dom';
+import SectionTitle from '../../components/SectionTitle/SectionTitle';
+import CommentSection from './CommentSection/CommentSection';
+import StatusBadge from './StatusBadge/StatusBadge';
 import { CiBookmark, CiStar } from "react-icons/ci";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { VscComment } from "react-icons/vsc";
 import { IoBookOutline } from "react-icons/io5";
-import { HiChevronDoubleRight } from "react-icons/hi";
-
-
 
 function StoryDetailPage() {
-    // Giả định bạn có hàm lấy dữ liệu truyện từ API dựa trên id truyện
-    // Ví dụ: const story = useFetchStory(storyId);
     const { storyId } = useParams();
-    const story = getStoryDetails(storyId); // Hàm giả định để lấy dữ liệu truyện
-
-    // Dữ liệu giả lập
-    // const isLoggedIn = true; // Giả lập trạng thái đăng nhập
-    const isChapterRead = (chapterId) => false; // Logic kiểm tra chương đã đọc (nếu có)
-
-    if (!story) {
-        return <div>Đang tải chi tiết truyện...</div>;
+    const navigate = useNavigate();
+    const [story, setStory] = useState(null);
+    const [sameAuthorStories, setSameAuthorStories] = useState([]);
+    const [chapters, setChapters] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        fetchStoryData();
+    }, [storyId]);
+    
+    const fetchStoryData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            
+            // Fetch data from stories.json
+            const response = await fetch('/data/stories.json');
+            if (!response.ok) {
+                throw new Error('Failed to fetch story data');
+            }
+            
+            const data = await response.json();
+            
+            // Find the story by ID
+            const storyData = data.storys.find(s => s.id === storyId);
+            if (!storyData) {
+                throw new Error(`Story with ID ${storyId} not found`);
+            }
+            
+            setStory(storyData);
+            
+            // Find other stories by the same author
+            const authorStories = data.storys
+                .filter(s => s.author === storyData.author && s.id !== storyId)
+                .slice(0, 5);
+            setSameAuthorStories(authorStories);
+            
+            // Get chapters for this story and sort them by number
+            const storyChapters = data.chapters
+                ? data.chapters
+                    .filter(c => c.story_id === storyId)
+                    .sort((a, b) => a.number - b.number)
+                : [];
+                
+            // Add timeAgo to each chapter
+            const chaptersWithTimeAgo = storyChapters.map(chapter => {
+                return {
+                    ...chapter,
+                    timeAgo: chapter.created_at ? formatTimeAgo(new Date(chapter.created_at)) : 'N/A'
+                };
+            });
+            
+            setChapters(chaptersWithTimeAgo);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching story:', error);
+            setError(error.message);
+            setLoading(false);
+        }
+    };
+    
+    // Format timeAgo for chapters
+    const formatTimeAgo = (date) => {
+        const now = new Date();
+        const diffMs = now - date;
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        
+        if (diffDays > 30) {
+            const diffMonths = Math.floor(diffDays / 30);
+            return `${diffMonths} tháng trước`;
+        } else if (diffDays > 0) {
+            return `${diffDays} ngày trước`;
+        } else {
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            if (diffHours > 0) {
+                return `${diffHours} giờ trước`;
+            } else {
+                const diffMinutes = Math.floor(diffMs / (1000 * 60));
+                return diffMinutes > 0 ? `${diffMinutes} phút trước` : 'Vừa xong';
+            }
+        }
+    };
+    
+    // Function to determine if chapter has been read
+    const isChapterRead = (chapterId) => {
+        try {
+            const readingHistory = JSON.parse(localStorage.getItem('readingHistory')) || [];
+            return readingHistory.some(item => 
+                item.storyId === storyId && item.lastChapterId === chapterId
+            );
+        } catch (e) {
+            return false;
+        }
+    };
+    
+    if (loading) {
+        return (
+            <div className="story-detail-page loading">
+                <Header />
+                <div className="loading-container">
+                    <div className="loading-spinner"></div>
+                    <p>Đang tải thông tin truyện...</p>
+                </div>
+                <Footer />
+            </div>
+        );
     }
-
+    
+    if (error || !story) {
+        return (
+            <div className="story-detail-page error">
+                <Header />
+                <div className="error-container">
+                    <h2>Không thể tải thông tin truyện</h2>
+                    <p>{error || 'Đã xảy ra lỗi không xác định'}</p>
+                    <button onClick={fetchStoryData} className="retry-button">Thử lại</button>
+                </div>
+                <Footer />
+            </div>
+        );
+    }
+    
+    // Get first chapter ID for "Read Story" button
+    const firstChapterId = chapters.length > 0 ? chapters[0].id : null;
+    
+    // Format the description
+    const formattedDescription = Array.isArray(story.description) 
+        ? story.description.map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+        ))
+        : <p>{story.description}</p>;
+    
     return (
         <div className="story-detail-page">
             <Header />
-            <div className="banner-placeholder">
-                <img src="https://static.cdnno.com/storage/topbox/f0e089d0cfb572cec383725c5572f854.webp" alt="Banner" />
-                
+            
+            <div className="banner">
+                <img 
+                    src="https://static.cdnno.com/storage/topbox/f0e089d0cfb572cec383725c5572f854.webp" 
+                    alt="Banner" 
+                    className="banner-image"
+                />
             </div>
-            <div className="story-info">
-                <div className="cover-container">
-                    <img src={story?.coverImage} alt={story?.title} className="cover-image" />
-                </div>
-                <div className="info-text">
-                    <h1>{story.title}</h1>
-                    <div className='text-author'>{story.author}</div>
-
-                    <div className="info-actions">
-                        <div className='read-story'>
-                            <button className="btn-read-story">
-                            <Link to={`/truyen/${storyId}/${story.chapters[0].id}`} className="btn-read-story">
-                                <IoBookOutline className='icon-fa' />
-                                <span>Đọc Truyện</span>
+            
+            <div className="content-container">
+                <div className="story-info">
+                    <div className="cover-container">
+                        <img 
+                            src={story.cover_url || '/images/placeholder-cover.jpg'} 
+                            alt={story.title} 
+                            className="cover-image" 
+                        />
+                        <StatusBadge status={story.status} />
+                    </div>
+                    
+                    <div className="info-text">
+                        <h2 className="story-title">{story.title}</h2>
+                        <div className="author-name">
+                            <Link to={`/author/${encodeURIComponent(story.author)}`}>
+                                {story.author}
                             </Link>
-                                
+                        </div>
+
+                        <div className="info-stats">
+                            <div className="stat">
+                                <div className="stat-value">{story.total_views?.toLocaleString() || 0}</div>
+                                <div className="stat-label">Lượt đọc</div>
+                            </div>
+                            <div className="stat">
+                                <div className="stat-value">{story.rating?.average || 0}</div>
+                                <div className="stat-label">Đánh giá ({story.rating?.count?.toLocaleString() || 0})</div>
+                            </div>
+                            <div className="stat">
+                                <div className="stat-value">{story.bookmarks_count?.toLocaleString() || 0}</div>
+                                <div className="stat-label">Cất giữ</div>
+                            </div>
+                        </div>
+                        
+                        <div className="categories-tags-container">
+                            {story.categories && story.categories.map((category, index) => (
+                                <Link to={`/category/${category}`} key={`category-${index}`}>
+                                    <span className="category-tag">{category}</span>
+                                </Link>
+                            ))}
+                            {story.tags && story.tags.map((tag, index) => (
+                                <Link to={`/tag/${tag}`} key={`tag-${index}`}>
+                                    <span className="tag">{tag}</span>
+                                </Link>
+                            ))}
+                        </div>
+
+                        <div className="info-actions">
+                            {firstChapterId ? (
+                                <Link to={`/story/${storyId}/chapter/${firstChapterId}`} className="btn1-primary">
+                                    <IoBookOutline className="icon" />
+                                    <span>Đọc Truyện</span>
+                                </Link>
+                            ) : (
+                                <button className="btn-primary disabled" disabled>
+                                    <IoBookOutline className="icon" />
+                                    <span>Chưa có chương</span>
+                                </button>
+                            )}
+                            <button className="btn-secondary">
+                                <CiBookmark className="icon" />
+                                <span>Đánh dấu</span>
+                            </button>
+                            <button 
+                                className="btn-secondary"
+                                onClick={() => document.querySelector('.chapter-list').scrollIntoView({ behavior: 'smooth' })}
+                            >
+                                <RxHamburgerMenu className="icon" />
+                                <span>Mục lục</span>
+                            </button>
+                            <button 
+                                className="btn-secondary"
+                                onClick={() => document.querySelector('.comment-section').scrollIntoView({ behavior: 'smooth' })}
+                            >
+                                <CiStar className="icon" />
+                                <span>Đánh giá</span>
+                            </button>
+                            <button 
+                                className="btn-secondary"
+                                onClick={() => document.querySelector('.comment-section').scrollIntoView({ behavior: 'smooth' })}
+                            >
+                                <VscComment className="icon" />
+                                <span>Thảo luận</span>
                             </button>
                         </div>
-                        <button className="btn">
-                            
-                            <CiBookmark className='icon-fa' />
-                            <span>Đánh dấu</span>
-                        </button>
-                        <button className="btn">
-                            <RxHamburgerMenu className='icon-fa' />
-                            <span>Mục lục</span>
-                        </button>
-                        <button className="btn">
-                            <CiStar className='icon-fa' />
-                            <span>Đánh giá</span>
-                        </button>
-                        <button className="btn">
-                            <VscComment className='icon-fa' />
-                            <span>Thảo luận</span>
-                        </button>
                     </div>
+                </div>
 
-                    <div className="info-stats">
-                        <div className="stat">
-                            <div className="stat-label">Lượt đọc</div>
-                            <div className="stat-value">{story.views}</div>
+                <div className="story-sections">
+                    {chapters.length > 0 && (
+                        <section className="chapter-list section-card">
+                            <SectionTitle 
+                                title="Danh sách chương" 
+                                viewAllLink={`/story/${storyId}/chapters`} 
+                            />
+                            <div className="chapters-grid">
+                                {chapters.slice(0, 10).map((chapter) => (
+                                    <Link 
+                                        to={`/story/${storyId}/chapter/${chapter.id}`}
+                                        key={chapter.id} 
+                                        className="chapter-item"
+                                    >
+                                        <div className="chapter-header">
+                                            <h3 className="chapter-title">Chương {chapter.number}: {chapter.title}</h3>
+                                        </div>
+                                        <div className="chapter-footer">
+                                            <span className="chapter-time">{chapter.timeAgo}</span>
+                                            {isChapterRead(chapter.id) && <span className="chapter-read-status"></span>}
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    <section className="introduction section-card">
+                        <SectionTitle title="Giới thiệu" />
+                        <div className="description-content">
+                            {formattedDescription}
                         </div>
-                        <div className="stat">
-                            <div className="stat-label">Đề cử</div>
-                            <div className="stat-value">{story.favorites}</div>
-                        </div>
-                        <div className="stat">
-                            <div className="stat-label">Cất giữ</div>
-                            <div className="stat-value">533</div> {/* Giả định */}
-                        </div>
-                    </div>
-                    <div className='rating-container'>
-                        <RatingStars rating={story.rating}/>
-                    </div>
-                    <div className='categories-tags-container'>
-                        <div className="tag-buttons-row">
-                            {story.categories.map((category, index) => (
-                            <Link to={`/category/${category}`} key={`category-${index}`}>
-                                <button className='tag-button'>{category}</button>
-                            </Link>
-                        ))}
-                            {story.tags.map((tag, index) => (
-                            <Link to={`/tag/${tag}`} key={`tag-${index}`}>
-                                <button className='tag-button'>{tag}</button>
-                            </Link>
-        ))}
-    </div>
-</div>
+                    </section>
                     
-                    <p>Tình trạng: {story.status}</p>
-                    
-                    {/* {isLoggedIn && <button className="add-library-btn">Thêm vào tủ truyện</button>} */}
+                    {sameAuthorStories.length > 0 && (
+                        <section className="same-author section-card">
+                            <SectionTitle 
+                                title="Cùng tác giả" 
+                                viewAllLink={`/author/${encodeURIComponent(story.author)}`} 
+                            />
+                            <div className="related-stories-grid">
+                                {sameAuthorStories.map(relatedStory => (
+                                    <Link 
+                                        to={`/story/${relatedStory.id}`} 
+                                        key={relatedStory.id} 
+                                        className="related-story-card"
+                                    >
+                                        <div className="related-story-cover">
+                                            <img src={relatedStory.cover_url || '/images/placeholder-cover.jpg'} alt={relatedStory.title} />
+                                        </div>
+                                        <h3 className="related-story-title">{relatedStory.title}</h3>
+                                    </Link>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    <CommentSection storyId={storyId} />
                 </div>
             </div>
-
-            <div className="chapter-list">
-                <div className="list-header">
-                    <h2>DANH SÁCH CHƯƠNG</h2>
-                    <button className='header-action'>
-                        <span className='header-action-text'>Xem tất cả</span>
-                        <HiChevronDoubleRight className='header-action-icon' />
-                    </button>
-                </div>
-                <div className="chapters-container">
-                    {story.chapters.map((chapter) => (
-                    <div className="chapter-item-wrapper" key={chapter.id}>
-                        <ChapterListItem chapter={chapter} isRead={isChapterRead(chapter.id)} />
-                    </div>
-                ))}
-                </div>
-            </div>
-
-            <div className="introduction">
-                <div className='list-header'>
-                        <h2>GIỚI THIỆU</h2>
-                </div>
-                <p>{story.introduction}</p>
-                <p>
-                "Sư phụ, rõ ràng Ma môn cao thủ xuất hiện lớp lớp, so tu sĩ chính đạo mạnh hơn rất nhiều, vì sao đều là Ma môn b·ị đ·ánh đến không ngẩng nổi đầu?"
-
-                "Bởi vì tu sĩ chính đạo địch nhân chỉ có Ma môn, mà Ma môn địch nhân bao gồm người bên cạnh. Ma tu luôn không khả năng như chính đạo dạng kia đồng tâm hiệp lực, mười tám Ma Tôn, mười ba c·ái c·hết bởi người trong ma đạo trong tay."
-
-                "Đồ nhi minh bạch, muốn để ma đạo hưng thịnh, đầu tiên muốn thống nhất Ma môn, cấm tiệt nội đấu a."
-
-                "Ngươi minh bạch cái rắm, cái kia ma đạo chẳng phải biến thành chính đạo?"
-
-                ...
-
-                Nhiều năm sau đó, Trần Nghiệp cuối cùng minh bạch ý của sư phụ, làm ma tu thành người đứng đầu chính đạo, cái kia ma đạo liền là chính đạo.
-                </p>
-                
-            </div>
-            <div className='introduction'>
-                <div className='list-header'>
-                    <h2>Cùng tác giả</h2>
-                </div>
-                <div>
-                    <p>Đấu Phá Thương Khung</p>
-                </div>
-            </div>
-
-            <CommentSection />
             <Footer />
-            
         </div>
     );
-}
-
-// Hàm giả định lấy dữ liệu truyện từ API
-function getStoryDetails(storyId) {
-    // Thay thế bằng logic fetch dữ liệu từ API dựa trên storyId
-    // Ví dụ: return fetch(`/api/stories/${storyId}`).then(response => response.json());
-    // Dữ liệu giả định
-    return {
-        id: storyId,
-        title: 'Đấu Phá Thương Khung',
-        coverImage: 'https://static.cdnno.com/poster/cac-nguoi-tu-tien-ta-lam-ruong/300.jpg',
-        author: 'Thiên Tằm Thổ Đậu',
-        introduction: 'Lý Huyền xuyên qua Võ Đạo vi tôn, thể chất là vua Thiên Huyền Đại Lục, bị mỹ nữ sư tôn thu làm đồ đệ, vốn cho rằng hội đi đến một đầu ầm ầm sóng dậy con đường Võ Đạo, không nghĩ tới bị kiểm tra đo lường ra trời sinh phàm thể, tu hành cả một đời cũng khó có thành tựu.',
-
-        categories: ['Tiên hiệp', 'Huyền huyễn', 'Xuyên không'],
-        tags: ['Tu luyện', 'Phiêu lưu'],
-        status: 'Hoàn thành',
-        rating: 4.5,
-        views: 12345,
-        favorites: 5678,
-        chapters: [
-            { id: 1, title: 'Chương 1: Mất đi đấu khí', url: '/dau-pha-thuong-khung/1' },
-            { id: 2, title: 'Chương 2: Thắng muốn thắng đến xinh đẹp (2)', url: '/dau-pha-thuong-khung/2' },
-            { id: 3, title: 'Chương 3: Nhẫn linh hồn', url: '/dau-pha-thuong-khung/3' },
-            // ... thêm các chương khác
-        ],
-    };
 }
 
 export default StoryDetailPage;

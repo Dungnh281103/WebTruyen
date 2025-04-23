@@ -1,9 +1,13 @@
-// NewlyUpdatedItem.js
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './NewlyUpdatedItem.scss';
 
 function NewlyUpdatedItem({ item }) {
+  // Prevent default behavior when clicking links inside the item
+  const handleClick = (e) => {
+    e.stopPropagation(); // Allow the link to work normally
+  };
+
   return (
     <div className="newly-updated-item">
       <div className="genre-section">
@@ -11,7 +15,11 @@ function NewlyUpdatedItem({ item }) {
       </div>
       
       <div className="title-section">
-        <Link to={item.storyUrl} className="story-title">
+        <Link 
+          to={item.storyUrl} 
+          className="story-title"
+          onClick={handleClick}
+        >
           {item.title}
         </Link>
       </div>

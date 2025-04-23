@@ -1,6 +1,6 @@
 import React from 'react';
 import StoryCard from '../../../../components/StoryCard';
-import SectionTitle from '../../../../components/SectionTitle';
+import SectionTitle from '../../../../components/SectionTitle/SectionTitle';
 import './CompletedStory.scss';
 
 function CompletedStory({ stories }) {
