@@ -1,8 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './Footer.css'; // File CSS cho Footer
-import logo from '../../assets/img/logo.png'; 
-
+import React from "react";
+import { Link } from "react-router-dom";
+import "./Footer.scss"; // File CSS cho Footer
+import logo1 from "../../assets/img/logo1.webp";
 
 function Footer() {
   const currentYear = new Date().getFullYear(); // Lấy năm hiện tại
@@ -17,13 +16,22 @@ function Footer() {
           <Link to="/chinh-sach-bao-mat">Chính sách bảo mật</Link>
           {/* Thêm các link khác nếu cần */}
         </div>
-        <div>My Novel là nền tảng mở trực tuyến, miễn phí đọc truyện chữ được đóng góp nội dung từ các tác giả viết truyện và các dịch giả convert, dịch truyện, rất nhiều truyện hay và nổi bật được cập nhật nhanh nhất với đủ các thể loại tiên hiệp, kiếm hiệp, huyền ảo ...</div>
-        <div className='footer-logo'>
+        <div>
+          SoraTruyenChu là nền tảng mở trực tuyến, miễn phí đọc truyện chữ được
+          đóng góp nội dung từ các tác giả viết truyện và các dịch giả convert,
+          dịch truyện, rất nhiều truyện hay và nổi bật được cập nhật nhanh nhất
+          với đủ các thể loại tiên hiệp, kiếm hiệp, huyền ảo ...
+        </div>
+        <div className="footer-logo">
           <Link to="/">
-          {/* Thay bằng thẻ img với logo của bạn */}
-              <img src={logo} alt="Logo Website" style={{ height: '40px', display: 'block' }} />
-          {/* Hoặc Text Logo */}
-          {/* <span style={{fontSize: '1.8em', fontWeight: 'bold'}}>Tên Web</span> */}
+            {/* Thay bằng thẻ img với logo của bạn */}
+            <img
+              src={logo1}
+              alt="Logo Website"
+              style={{ height: "50px", display: "block" }}
+            />
+            {/* Hoặc Text Logo */}
+            {/* <span style={{fontSize: '1.8em', fontWeight: 'bold'}}>Tên Web</span> */}
           </Link>
         </div>
         <div className="footer-copyright">

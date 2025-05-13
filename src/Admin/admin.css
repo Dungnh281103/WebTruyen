@@ -1,0 +1,82 @@
+/* Admin UI Styles */
+.admin-wrapper {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+  }
+  
+  /* Sidebar styles */
+  .offcanvas {
+    width: 280px;
+  }
+  
+  .offcanvas .nav-link {
+    padding: 0.8rem 1rem;
+    color: #212529;
+    transition: all 0.2s;
+  }
+  
+  .offcanvas .nav-link:hover {
+    background-color: #f8f9fa;
+    color: #0d6efd;
+  }
+  
+  /* Main content */
+  .main-content {
+    padding: 20px;
+  }
+  
+  /* Cards */
+  .card {
+    transition: all 0.2s;
+  }
+  
+  .card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+  
+  /* Activity list */
+  .activity-list ul li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f1f1;
+  }
+  
+  .activity-list ul li:last-child {
+    border-bottom: none;
+  }
+  
+  /* Tables */
+  .table th {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  
+  /* Story Admin specific */
+  .story-admin .table td {
+    vertical-align: middle;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .offcanvas {
+      width: 75%;
+    }
+  }
+
+
+  .no-caret::after {
+  display: none !important;
+}
+
+.table-responsive {
+  min-height: 300px;
+}
+
+.pagination .page-link {
+  color: #585858;
+}
+
+.pagination .active .page-link {
+  background-color: #676fd8;
+  border-color: #676fd8;
+  color: white;
+}

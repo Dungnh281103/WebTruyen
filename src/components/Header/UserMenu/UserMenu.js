@@ -1,24 +1,34 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { FaUserCircle, FaBookmark, FaHistory, FaCog, FaQuestion, 
-  FaCrown, FaUpload, FaWarehouse, FaStar, FaSignOutAlt, FaTimes } from 'react-icons/fa';
-import './UserMenu.scss';
+import React, { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
+import {
+  FaUserCircle,
+  FaBookmark,
+  FaHistory,
+  FaCog,
+  FaQuestion,
+  FaCrown,
+  FaUpload,
+  FaWarehouse,
+  FaStar,
+  FaSignOutAlt,
+  FaTimes,
+} from "react-icons/fa";
+import "./UserMenu.scss";
 
 const UserMenu = ({ user, onLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
-  
-  // Close menu when clicking outside
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setIsMenuOpen(false);
       }
     }
-    
-    document.addEventListener('mousedown', handleClickOutside);
+
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [menuRef]);
 
@@ -28,18 +38,18 @@ const UserMenu = ({ user, onLogout }) => {
 
   return (
     <div className="user-menu-wrapper" ref={menuRef}>
-      <button 
-        className="user-menu-toggle" 
+      <button
+        className="user-menu-toggle"
         onClick={toggleMenu}
         aria-label="Menu người dùng"
         aria-expanded={isMenuOpen}
       >
         <div className="user-info">
           {user.avatar_url ? (
-            <img 
-              src={user.avatar_url} 
-              alt={user.display_name || user.username} 
-              className="user-avatar" 
+            <img
+              src={user.avatar_url}
+              alt={user.display_name || user.username}
+              className="user-avatar"
             />
           ) : (
             <FaUserCircle className="user-icon" />
@@ -52,16 +62,18 @@ const UserMenu = ({ user, onLogout }) => {
           <div className="user-dropdown-header">
             <div className="user-profile-summary">
               {user.avatar_url ? (
-                <img 
-                  src={user.avatar_url} 
-                  alt={user.display_name || user.username} 
-                  className="user-avatar-large" 
+                <img
+                  src={user.avatar_url}
+                  alt={user.display_name || user.username}
+                  className="user-avatar-large"
                 />
               ) : (
                 <FaUserCircle className="user-icon-large" />
               )}
               <div className="user-details">
-                <div className="user-display-name">{user.display_name || user.username}</div>
+                <div className="user-display-name">
+                  {user.display_name || user.username}
+                </div>
                 <span className="badge badge-danger">{user.badge || "0"}</span>
               </div>
             </div>
@@ -69,45 +81,29 @@ const UserMenu = ({ user, onLogout }) => {
               Thoát
             </button>
           </div>
-          
+
           <nav className="user-menu-nav">
             <ul className="submenu">
-              {/* <li>
-                <Link to="/nang-cap-tai-khoan" onClick={() => setIsMenuOpen(false)}>
-                <span className="bullet">•</span>
-                  <span>Nâng cấp tài khoản</span>
-                  <span className="new-badge">NEW</span>
-                </Link>
-              </li> */}
               <li>
                 <Link to="/tu-truyen" onClick={() => setIsMenuOpen(false)}>
-                    <span className="bullet">•</span>
+                  <span className="bullet">•</span>
                   <span>Tủ truyện của tôi</span>
                 </Link>
               </li>
-              {/* <li>
-                <Link to="/lich-su-giao-dich" onClick={() => setIsMenuOpen(false)}>
-                <span className="bullet">•</span>
-                  <span>Lịch sử giao dịch</span>
-                </Link>
-              </li> */}
+
               <li>
                 <Link to="/tai-khoan" onClick={() => setIsMenuOpen(false)}>
-                <span className="bullet">•</span>
+                  <span className="bullet">•</span>
                   <span>Cài đặt cá nhân</span>
                 </Link>
               </li>
               <li>
                 <Link to="/ho-tro" onClick={() => setIsMenuOpen(false)}>
-                <span className="bullet">•</span>
+                  <span className="bullet">•</span>
                   <span>Yêu cầu hỗ trợ</span>
                 </Link>
               </li>
             </ul>
-
-            
-
-          
 
             <ul className="sub-menu-items">
               <li>
@@ -129,7 +125,10 @@ const UserMenu = ({ user, onLogout }) => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/truyen-full" onClick={() => setIsMenuOpen(false)}>
+                    <Link
+                      to="/truyen-full"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
                       <span className="bullet">•</span>
                       <span>Truyện full</span>
                     </Link>
@@ -143,19 +142,28 @@ const UserMenu = ({ user, onLogout }) => {
                 </div>
                 <ul className="submenu">
                   <li>
-                    <Link to="/xep-hang-luot-doc" onClick={() => setIsMenuOpen(false)}>
+                    <Link
+                      to="/xep-hang-luot-doc"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
                       <span className="bullet">•</span>
                       <span>Xếp hạng lượt đọc</span>
                     </Link>
                   </li>
                   <li>
-                    <Link to="/xep-hang-de-cu" onClick={() => setIsMenuOpen(false)}>
+                    <Link
+                      to="/xep-hang-de-cu"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
                       <span className="bullet">•</span>
                       <span>Xếp hạng đề cử</span>
                     </Link>
                   </li>
                   <li>
-                    <Link to="/xep-hang-binh-luan" onClick={() => setIsMenuOpen(false)}>
+                    <Link
+                      to="/xep-hang-binh-luan"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
                       <span className="bullet">•</span>
                       <span>Xếp hạng bình luận</span>
                     </Link>

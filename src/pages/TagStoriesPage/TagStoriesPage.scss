@@ -1,0 +1,114 @@
+.tag-stories-page {
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .banner {
+      width: 100%;
+      margin-bottom: 20px;
+      
+      .banner-image {
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+      }
+    }
+    
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      
+      h1 {
+        font-size: 24px;
+        margin: 0;
+        color: #333;
+        
+        .highlighted-tag {
+          color: #b78a28;
+          font-weight: 600;
+        }
+      }
+      
+      .filter-button {
+        display: flex;
+        align-items: center;
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 8px 16px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        
+        &:hover {
+          background-color: #e0e0e0;
+        }
+        
+        .filter-icon {
+          margin-right: 8px;
+        }
+      }
+    }
+    
+    .loading-indicator {
+      text-align: center;
+      padding: 40px;
+      font-size: 16px;
+      color: #666;
+    }
+    
+    .error-message {
+      text-align: center;
+      padding: 40px;
+      color: #d32f2f;
+      font-size: 16px;
+    }
+    
+    .stories-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr; // Two columns as in your other pages
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+    
+    .no-stories {
+      padding: 40px 0;
+      text-align: center;
+      font-size: 16px;
+      color: #666;
+      
+      .home-link {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 8px 20px;
+        background-color: #b78a28;
+        color: white;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background-color 0.2s;
+        
+        &:hover {
+          background-color: darken(#b78a28, 10%);
+        }
+      }
+    }
+    
+    @media (max-width: 767px) {
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        
+        h1 {
+          margin-bottom: 15px;
+        }
+      }
+      
+      .stories-grid {
+        grid-template-columns: 1fr; // Single column on mobile
+      }
+    }
+  }

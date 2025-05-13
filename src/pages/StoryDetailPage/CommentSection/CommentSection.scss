@@ -227,6 +227,11 @@
           font-size: 14px;
           line-height: 1.5;
         }
+
+        .review-content p {
+          white-space: pre-wrap;   /* giữ khoảng trắng và xuống dòng */
+          word-break: break-word;  /* xuống hàng nếu quá dài */
+        }
         
         .review-footer {
           .like-button {

@@ -1,14 +1,4 @@
 
-body {
-    margin-left: 150px;
-    margin-right: 150px;
-    /* Các style global khác (font, màu nền,...) */
-}
-/* Hoặc nếu bạn có một container chính cho toàn bộ trang */
-#root > div { /* Chọn trực tiếp div con của #root */
-    margin-left: 150px;
-    margin-right: 150px;
-}
 
 *, :before, :after {
     box-sizing: border-box;

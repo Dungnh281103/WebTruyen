@@ -1,59 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 // import { Link, Routes, Route } from 'react-router-dom';
-// Giả định các component này nằm trong thư mục components một cấp trên HomePage
-import Header from '../../components/Header/Header';
-import Footer from '../../components/Footer/Footer';
-import SectionTitle from '../../components/SectionTitle/SectionTitle';
-import DetailedStoryItem from './components/DetailedStoryItem/DetailedStoryItem'; // Import component mới cho Đề cử
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
+import SectionTitle from "../../components/SectionTitle/SectionTitle";
+import DetailedStoryItem from "./components/DetailedStoryItem/DetailedStoryItem"; // Import component mới cho Đề cử
 
-// Giả định các component này nằm cùng cấp hoặc trong thư mục con của HomePage
-import RecentlyReadList from '../RecentlyReadList';
-import NewlyUpdatedList from '../NewlyUpdatedList';
-import RecentReviewsList from './components/RecentReviewsList/RecentReviewsList';
-// import StoryGrid from '../components/StoryGrid/StoryGrid'; // Tạm thời không dùng StoryGrid cho Đề Cử nữa
-import StoryCard from '../../components/StoryCard'; // Vẫn dùng cho Hot, Hoàn thành
-import CompletedStory from './components/CompletedStory/CompletedStory';
-import HotStory from './components/HotStory/HotStory';
-import './HomePage.scss'; // Import file CSS chung
-import { isLoggedIn, fetchUserData } from '../../utils/dataService';
-import { fetchRecommendedStories } from '../../apis/storyServices';
+import RecentlyReadList from "../RecentlyReadList";
+import NewlyUpdatedList from "../NewlyUpdatedList";
+import RecentReviewsList from "./components/RecentReviewsList/RecentReviewsList";
+// import StoryGrid from '../components/StoryGrid/StoryGrid';
+import StoryCard from "../../components/StoryCard"; // Vẫn dùng cho Hot, Hoàn thành
+import CompletedStory from "./components/CompletedStory/CompletedStory";
+import HotStory from "./components/HotStory/HotStory";
+import "./HomePage.scss"; // Import file CSS chung
+import { isLoggedIn, fetchUserData } from "../../utils/dataService";
+import { fetchRecommendedStories } from "../../apis/storyServices";
+import { fetchHotStories } from "../../apis/storyServices"; // Import hàm lấy truyện hot
+import { fetchLatestChapters } from "../../apis/storyServices"; // Import hàm lấy truyện mới cập nhật
+import { fetchCompletedStories } from "../../apis/storyServices";
 // import StoryDetailPage from '../components/StoryDetailPage/StoryDetailPage';
-
 
 const fetchHomePageData = async () => {
   try {
-    
-    const recommendedStories = await fetchRecommendedStories(); 
-    const response = await fetch('/data/stories.json');
+    const recommendedStories = await fetchRecommendedStories();
+    const latestChapters = await fetchLatestChapters(10); // Lấy 10 chương mới nhất
+    const hotStories = await fetchHotStories(5); // Lấy 5 truyện hot nhất
+    const completedStories = await fetchCompletedStories(); // Lấy truyện đã hoàn thành
+    const response = await fetch("/data/stories.json");
     if (!response.ok) {
-      throw new Error('Failed to fetch data');
+      throw new Error("Failed to fetch data");
     }
     const data = await response.json();
-    
-    
+
     const loggedIn = isLoggedIn();
     let userData = null;
-    
+
     if (loggedIn) {
       userData = await fetchUserData();
     }
-    
 
     return {
       recentlyRead: getSavedRecentlyRead(), // Get from localStorage
       newlyUpdated: getNewlyUpdated(data.storys), // Process from stories.json
-      hotStories: getHotStories(data.storys), // Sort by views
-      recommendedStories: recommendedStories, 
-      completedStories: data.storys
-        .filter(story => story.status === 'completed')
-        .slice(0, 5), // Limit to 5 completed stories
+      latestChapters: latestChapters, // Newest chapters
+      hotStories: hotStories, // Sort by views
+      recommendedStories: recommendedStories,
+      completedStories: completedStories, // Completed stories
       // recentReviews: data.reviews || [], // If reviews are in the JSON
       isUserLoggedIn: !!userData,
-      userData: userData // Function to check login status
+      userData: userData, // Function to check login status
     };
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error("Error fetching data:", error);
     // Return empty data on error
     return {
       recentlyRead: [],
@@ -61,8 +60,9 @@ const fetchHomePageData = async () => {
       hotStories: [],
       recommendedStories: [],
       completedStories: [],
+      latestChapters: [],
       // recentReviews: [],
-      isUserLoggedIn: false
+      isUserLoggedIn: false,
     };
   }
 };
@@ -70,7 +70,10 @@ const fetchHomePageData = async () => {
 // Helper functions
 const getNewlyUpdated = (stories) => {
   return stories
-    .sort((a, b) => new Date(b.last_chapter_update) - new Date(a.last_chapter_update))
+    .sort(
+      (a, b) =>
+        new Date(b.last_chapter_update) - new Date(a.last_chapter_update)
+    )
     .slice(0, 10);
 };
 
@@ -82,7 +85,7 @@ const getHotStories = (stories) => {
 
 const getSavedRecentlyRead = () => {
   try {
-    const saved = localStorage.getItem('readingHistory');
+    const saved = localStorage.getItem("readingHistory");
     return saved ? JSON.parse(saved) : [];
   } catch (e) {
     return [];
@@ -90,7 +93,7 @@ const getSavedRecentlyRead = () => {
 };
 
 const checkUserLoggedIn = () => {
-  return localStorage.getItem('userToken') !== null;
+  return localStorage.getItem("userToken") !== null;
 };
 
 // Tách riêng phần nội dung để dùng hook bên trong Router context
@@ -100,7 +103,6 @@ function HomePageContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  console.log('toi da den')
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
@@ -109,7 +111,7 @@ function HomePageContent() {
         const data = await fetchHomePageData(); // Gọi API thật ở đây
         setHomeData(data);
       } catch (err) {
-        setError('Không thể tải dữ liệu trang chủ. Vui lòng thử lại.');
+        setError("Không thể tải dữ liệu trang chủ. Vui lòng thử lại.");
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -119,7 +121,6 @@ function HomePageContent() {
   }, []);
 
   if (isLoading) {
-    
     return <div className="loading-indicator">Đang tải trang chủ...</div>;
   }
 
@@ -137,19 +138,21 @@ function HomePageContent() {
     hotStories,
     recommendedStories,
     completedStories,
+    latestChapters,
     // recentReviews,
-    isUserLoggedIn
+    isUserLoggedIn,
   } = homeData;
-
-
 
   return (
     <div className="home-page">
-      <Header/>
+      <Header />
 
       {/* --- Banner --- */}
       <div className="banner-placeholder">
-        <img src="https://static.cdnno.com/storage/topbox/f0e089d0cfb572cec383725c5572f854.webp" alt="Banner" />
+        <img
+          src="https://static.cdnno.com/storage/topbox/f0e089d0cfb572cec383725c5572f854.webp"
+          alt="Banner"
+        />
       </div>
 
       {/* --- Truyện Vừa Đọc --- */}
@@ -160,87 +163,89 @@ function HomePageContent() {
         </section>
       )}
 
-     
       {/* --- Truyện Đề Cử (LAYOUT MỚI) --- */}
       {recommendedStories && recommendedStories.length > 0 && (
-  <section className="section section--recommended-stories">
-    <SectionTitle title=" Truyện Đề Cử" viewAllLink="/de-cu" />
-    <div className="recommended-stories-grid">
-      {recommendedStories.slice(0, 6).map((story) => (
-        <DetailedStoryItem 
-          key={story.id} 
-          story={story} 
-        />
-      ))}
-    </div>
-  </section>
-)}
-      
+        <section className="section section--recommended-stories">
+          <SectionTitle title=" Truyện Đề Cử" viewAllLink="/de-cu" />
+          <div className="recommended-stories-grid">
+            {recommendedStories.slice(0, 6).map((story) => (
+              <DetailedStoryItem key={story.id} story={story} />
+            ))}
+          </div>
+        </section>
+      )}
+
       <div className="banner-placeholder">
-        <img src="https://static.cdnno.com/storage/topbox/d1aba67b1aabe385d2857ce5080ad93f.webp" alt="Banner" />
+        <img
+          src="https://static.cdnno.com/storage/topbox/d1aba67b1aabe385d2857ce5080ad93f.webp"
+          alt="Banner"
+        />
       </div>
 
       {/* --- Truyện Hot --- */}
       {hotStories && hotStories.length > 0 && (
-  <section className="section section--hot-stories">
-    <SectionTitle title=" Truyện Hot" viewAllLink="/xep-hang/hot" />
-    <div className="hot-stories-grid">
-      {hotStories.map((story) => (
-        <div key={story.id} onClick={() => navigate(`/story/${story.id}`)}>
-          <StoryCard key={story.id} story={story} />
-        </div>
-      ))}
-    </div>
-  </section>
-)}
-
-      {/* --- Truyện Mới Cập Nhật --- */}
-      {newlyUpdated && newlyUpdated.length > 0 && (
-        <section className="section section--newly-updated">
-          <SectionTitle title=" Truyện Mới Cập Nhật" viewAllLink="/truyen-moi" />
-          <NewlyUpdatedList items={newlyUpdated} />
+        <section className="section section--hot-stories">
+          <SectionTitle title=" Truyện Hot" viewAllLink="/xep-hang/hot" />
+          <div className="hot-stories-grid">
+            {hotStories.map((story) => (
+              <div
+                key={story.id}
+                onClick={() => navigate(`/story/${story.id}`)}
+              >
+                <StoryCard key={story.id} story={story} />
+              </div>
+            ))}
+          </div>
         </section>
       )}
 
-      
+      {/* <HotStory /> */}
+
+      {latestChapters && latestChapters.length > 0 && (
+        <section className="section section--newly-updated-api">
+          <SectionTitle title=" Chương Mới Nhất" viewAllLink="/truyen-moi" />
+          <NewlyUpdatedList items={latestChapters} />
+        </section>
+      )}
+
+      {/* --- Truyện Mới Cập Nhật --- */}
+      {/* {newlyUpdated && newlyUpdated.length > 0 && (
+        <section className="section section--newly-updated">
+          <SectionTitle
+            title=" Truyện Mới Cập Nhật"
+            viewAllLink="/truyen-moi"
+          />
+          <NewlyUpdatedList items={newlyUpdated} />
+        </section>
+      )} */}
 
       <div className="banner-placeholder">
-        <img src="https://static.cdnno.com/storage/topbox/d246998f2320b39a1044b3c2853f116c.webp" alt="Banner" />
+        <img
+          src="https://static.cdnno.com/storage/topbox/d246998f2320b39a1044b3c2853f116c.webp"
+          alt="Banner"
+        />
       </div>
 
       {/* --- Truyện Đã Hoàn Thành --- */}
       {completedStories && completedStories.length > 0 && (
         <section className="section section--completed-stories">
-        
           <CompletedStory stories={completedStories} />
         </section>
       )}
 
-       {/* --- Đánh Giá Mới --- */}
-      {/* {recentReviews && recentReviews.length > 0 && (
-        <section className="section section--recent-reviews">
-          <SectionTitle title=" Đánh Giá Mới" viewAllLink="/danh-gia" />
-          <RecentReviewsList reviews={recentReviews} maxReviews={5}/>
-        </section>
-      )} */}
       {/* --- Đánh Giá Mới --- */}
-      <section className="section section--recent-reviews">
+      {/* <section className="section section--recent-reviews">
         <SectionTitle title=" Đánh Giá Mới" viewAllLink="/danh-gia" />
-        <RecentReviewsList maxReviews={5}/>
-      </section>
-  
-        {/* --- Footer --- */}
+        <RecentReviewsList maxReviews={5} />
+      </section> */}
+
       <Footer />
     </div>
   );
 }
 
-// Component HomePage chính, có thể chứa Router nếu chưa có ở App.js
 function HomePage() {
-  // Giả sử Router đã được bao ở App.js
   return <HomePageContent />;
 }
 
 export default HomePage;
-
-

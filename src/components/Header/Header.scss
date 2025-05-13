@@ -1,128 +1,185 @@
-/* Header.css */
+/* Header.scss */
 
 .site-header {
-    background-color: #ffffff; /* Nền trắng */
-    border-bottom: 1px solid #f0f0f0; /* Border dưới rất mờ */
-    padding: 5px 0; /* Giảm padding dọc */
-    /* position: sticky; */
-    top: 0;
-    z-index: 1000;
-    height: 60px; /* Chiều cao cố định cho header */
+  background-color: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 5px 0;
+  top: 0;
+  z-index: 1000;
+  height: 60px;
+}
+
+.header-container {
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+/* --- Search (Left) --- */
+.header-search {
+  flex: 1 0 0;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.search-container {
+  position: relative;
+}
+
+.search-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.3em;
+  padding: 8px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    color: #000;
+  }
+}
+
+/* Ô tìm kiếm cố định */
+.search-input {
+  position: absolute;
+  left: 40px; /* Điều chỉnh vị trí nếu cần */
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 8px 15px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  width: 300px;
+  font-size: 14px;
+  z-index: 1050;
+}
+
+/* Search Results Styling - với z-index cao */
+.search-results-container {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  width: 350px;
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 2000; /* Z-index cao hơn để nổi lên trên */
+}
+
+.search-results-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.search-results-list li {
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: #f8f8f8;
   }
   
-  .header-container {
-    /* max-width: 1200px; */ /* Bỏ hoặc comment dòng này */
-    /* margin: 0 auto; */    /* Bỏ hoặc comment dòng này */
-    /* margin-left: 195px;  Thêm margin trái */
-    /* margin-right: 195px; Thêm margin phải */
-    padding: 0; /* Bỏ padding ngang cũ nếu có, vì margin đã tạo khoảng cách */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 100%;
+  &:not(:last-child) {
+    border-bottom: 1px solid #eee;
   }
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+}
+
+.search-result-image {
+  width: 50px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 12px;
+}
+
+.search-result-info {
+  flex: 1;
+}
+
+.search-result-title {
+  margin: 0 0 5px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.search-result-author {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.search-loading, 
+.search-no-results {
+  padding: 15px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}
+
+/* --- Logo (Center) --- */
+.header-logo {
+  text-align: center;
   
-  /* --- Search (Left) --- */
-  .header-search {
-    flex: 1 0 0; /* Chiếm 1 phần, co lại nếu cần, cơ sở là 0 */
-    display: flex;
-    justify-content: flex-start; /* Căn icon về bên trái */
-  }
-  
-  .search-icon-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.3em; /* Icon to hơn chút */
-    padding: 8px; /* Tăng vùng click */
-    color: #555; /* Màu icon xám */
-    display: flex; /* Để căn giữa icon bên trong */
-    align-items: center;
-    justify-content: center;
-  }
-  .search-icon-btn:hover {
-    color:#000;
-  }
-  
-  /* Ẩn input đi, chỉ hiện khi state isSearchVisible=true (logic React) */
-  /* Có thể thêm CSS để input hiện ra dạng overlay hoặc pop-up thay vì inline */
-  .search-input {
-    /* CSS để định vị input nếu nó hiện ra dạng khác */
-    /* position: absolute; Ví dụ: Hiện ra ngay dưới header */
-    top: 100%;
-    left: 20px; /* Hoặc vị trí mong muốn */
-    padding: 10px 15px;
-    border: 2px solid #ccc;
-    border-radius: 10px;
-    
-    /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
-    width: 300px;
-    /* z-index: 999; */
-    /* Thêm display: none; và chỉ hiện khi có class active hoặc state=true */
-    /* display: none; */
-  }
-  /* .search-input.visible { display: block; } */
-  
-  
-  /* --- Logo (Center) --- */
-  .header-logo {
-    text-align: center; /* Đảm bảo logo căn giữa nếu có text */
-    /* Không cần flex: 1 nếu search và user-actions đã có flex: 1 */
-  }
-  .header-logo a {
+  a {
     display: inline-block;
   }
-  .header-logo img {
-    height: 35px; /* Điều chỉnh chiều cao logo */
+  
+  img {
+    height: 50px;
     display: block;
-    /* Thêm style cho logo dạng text/icon như trong ảnh nếu cần */
-    /* Ví dụ:
-    background-color: #ffc107;
-    color: #fff;
-    padding: 5px 10px;
-    font-weight: bold;
-    border-radius: 4px;
-    */
   }
-  
-  /* --- User Actions (Right) --- */
-  .header-user-actions {
-    flex: 1 0 0; /* Chiếm 1 phần, co lại nếu cần, cơ sở là 0 */
-    display: flex;
-    align-items: center;
-    justify-content: flex-end; /* Căn icon về bên phải */
-    position: relative;
-  }
-  
-  /* Style cho icon user/avatar */
-  .user-avatar-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px; /* Kích thước avatar/icon user */
-    height: 32px;
-  }
-  
-  .user-avatar-img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-  
-  .user-avatar-icon {
-    font-size: 1.8em; /* Kích thước icon user mặc định */
-    color: #e89aaa; /* Màu hồng nhạt giống ảnh */
-  }
-  
-  /* Auth links khi chưa đăng nhập (nếu cần giữ lại) */
-  // SCSS for auth buttons
-// SCSS for auth buttons with yellow color scheme
+}
+
+/* --- User Actions (Right) --- */
+.header-user-actions {
+  flex: 1 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+}
+
+/* User avatar styles */
+.user-avatar-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.user-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-avatar-icon {
+  font-size: 1.8em;
+  color: #e89aaa;
+}
+
+/* Auth buttons */
 .auth-links {
   display: flex;
   align-items: center;
@@ -137,14 +194,8 @@
     font-weight: 400;
     transition: all 0.3s ease;
     
-    i {
-      font-size: 1.1rem;
-      
-    }
-    
     &.login-btn {
       background-color: transparent;
-      
       border: 1px solid #ffc107;
       margin-right: 2px;
       
@@ -172,61 +223,50 @@
     }
   }
 }
-    
+
+/* User dropdown menu */
+.user-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  list-style: none;
+  padding: 8px 0;
+  margin: 0;
+  min-width: 180px;
+  z-index: 1100;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+}
+
+.user-menu-container:hover .user-dropdown-menu,
+.user-avatar-btn:focus + .user-dropdown-menu,
+.user-dropdown-menu:hover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.user-dropdown-menu li a,
+.user-dropdown-menu li button {
+  display: block;
+  padding: 10px 18px;
+  text-decoration: none;
+  color: #333;
+  white-space: nowrap;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.95em;
   
-  
-  /* Dropdown menu (giữ nguyên hoặc chỉnh sửa style nếu cần) */
-  .user-dropdown-menu {
-    position: absolute;
-    top: calc(100% + 5px); /* Khoảng cách dưới avatar */
-    right: 0;
-    background-color: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    list-style: none;
-    padding: 8px 0; /* Giảm padding */
-    margin: 0;
-    min-width: 180px; /* Rộng hơn chút */
-    z-index: 1100;
-    opacity: 0; /* Ẩn ban đầu */
-    visibility: hidden; /* Ẩn hoàn toàn */
-    transform: translateY(-10px); /* Hiệu ứng trượt xuống */
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
-  }
-  
-  .user-menu-container:hover .user-dropdown-menu, /* Hiện khi hover container */
-  .user-avatar-btn:focus + .user-dropdown-menu, /* Hiện khi focus nút (accessibility) */
-  .user-dropdown-menu:hover /* Giữ menu hiện khi hover vào chính nó */
-  {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-  }
-  /* Hoặc dùng logic state của React để quản lý visible class */
-  /* .user-dropdown-menu.visible {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-  } */
-  
-  
-  .user-dropdown-menu li a,
-  .user-dropdown-menu li button {
-    display: block;
-    padding: 10px 18px; /* Tăng padding */
-    text-decoration: none;
-    color: #333;
-    white-space: nowrap;
-    background: none;
-    border: none;
-    width: 100%;
-    text-align: left;
-    cursor: pointer;
-    font-size: 0.95em; /* Chữ to hơn chút */
-  }
-  .user-dropdown-menu li a:hover,
-  .user-dropdown-menu li button:hover {
+  &:hover {
     background-color: #f5f5f5;
   }
-  /* ... style cho hr, logout-button giữ nguyên ... */
+}

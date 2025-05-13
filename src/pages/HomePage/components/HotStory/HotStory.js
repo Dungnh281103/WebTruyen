@@ -1,37 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { fetchFeaturedStories } from '../../../../utils/dataService'; // Adjust the import path as necessary
-import StoryCard from '../../../../components/StoryCard';
-import SectionTitle from '../../../../components/SectionTitle/SectionTitle';
-import './HotStory.scss';
+import React, { useState, useEffect } from "react";
+import { fetchHotStories } from "../../../../apis/storyServices";
+import StoryCard from "../../../../components/StoryCard";
+import SectionTitle from "../../../../components/SectionTitle/SectionTitle";
+import "./HotStory.scss";
 
 function HotStory() {
-  const [story, setStory] = useState([]);
+  const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadHotStory = async () => {
+    const loadHotStories = async () => {
       setLoading(true);
       try {
-        const featuredData = await fetchFeaturedStories();
-        // Get hot story from the featured data
-        const hotStory = featuredData.hot || [];
-        // Limit to maximum 5 story
-        setStory(hotStory.slice(0, 5));
+        const hotStories = await fetchHotStories(5);
+        setStories(hotStories);
       } catch (error) {
-        console.error('Failed to load hot story:', error);
+        console.error("Failed to load hot stories:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadHotStory();
+    loadHotStories();
   }, []);
 
   if (loading) {
     return <div className="loading-spinner">Loading...</div>;
   }
 
-  if (!story.length) {
+  if (!stories.length) {
     return null;
   }
 
@@ -39,7 +36,7 @@ function HotStory() {
     <section className="section section--hot-story">
       <SectionTitle title="Truyện Hot" viewAllLink="/xep-hang/hot" />
       <div className="hot-story-grid">
-        {story.map(story => (
+        {stories.map((story) => (
           <StoryCard key={story.id} story={story} />
         ))}
       </div>

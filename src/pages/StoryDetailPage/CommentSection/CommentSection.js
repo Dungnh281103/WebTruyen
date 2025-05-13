@@ -1,360 +1,279 @@
-import React, { useState, useEffect } from 'react';
-import { FaStar, FaUserCircle } from 'react-icons/fa';
-import './CommentSection.scss';
+// src/components/CommentSection.jsx
+import React, { useState, useEffect } from "react";
+import ReviewSection from "../ReviewSection/ReviewSection";
+import DiscussionSection from "../DiscussionSection/DiscussionSection";
+import { fetchRatings } from "../../../apis/storyServices";
+import { postRating } from "../../../apis/storyServices";
+import { fetchComments } from "../../../apis/storyServices";
+import { postComment } from "../../../apis/storyServices";
+import { fetchAllChapter } from "../../../apis/chapterServices";
+import "./CommentSection.scss";
 
-function CommentSection({ storyId }) {
-    const [activeTab, setActiveTab] = useState('review');
-    const [rating, setRating] = useState(0);
-    const [comment, setComment] = useState('');
-    const [comments, setComments] = useState([]);
-    const [reviews, setReviews] = useState([]);
-    const [newComment, setNewComment] = useState('');
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [isRatingOnly, setIsRatingOnly] = useState(false);
+export default function CommentSection({ storyId }) {
+  // State for chapters
+  const [chapters, setChapters] = useState([]);
+  // Tab hiện tại: 'review' hoặc 'comment'
+  const [activeTab, setActiveTab] = useState("review");
 
-    // Fetch comments and reviews from JSON data
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setIsLoading(true);
-                setError(null);
+  // State cho ReviewSection
+  const [reviews, setReviews] = useState([]);
+  const [ratingValue, setRatingValue] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [isRatingOnly, setIsRatingOnly] = useState(false);
 
-                // Fetch from stories.json
-                const response = await fetch('/data/stories.json');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch comments data');
-                }
+  // State cho DiscussionSection
+  const [comments, setComments] = useState([]);
+  const [newCommentText, setNewCommentText] = useState("");
+  const [selectedChapterId, setSelectedChapterId] = useState(null);
 
-                const data = await response.json();
-                
-                // Find story comments and reviews
-                const storyData = data.storys?.find(s => s.id === storyId);
-                
-                if (storyData) {
-                    // Get comments for this story
-                    const storyComments = data.comments?.filter(c => c.story_id === storyId) || [];
-                    setComments(storyComments);
-                    
-                    // Get reviews for this story
-                    const storyReviews = data.reviews?.filter(r => r.story_id === storyId) || [];
-                    setReviews(storyReviews);
-                }
-                
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error fetching comments:', error);
-                setError('Không thể tải bình luận và đánh giá. Vui lòng thử lại.');
-                setIsLoading(false);
-            }
-        };
+  // Loading & error
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState(null);
 
-        fetchData();
-    }, [storyId]);
+  // Format ngày giờ
+  const formatDate = (isoString) =>
+    new Date(isoString).toLocaleString("vi-VN", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
-    const handleRatingChange = (event) => {
-        setRating(parseFloat(event.target.value));
-    };
+  // Format time ago function (copy from your StoryDetail component or simple implementation)
+  const formatTimeAgo = (date) => {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
 
-    const handleSubmitReview = () => {
-        if (isRatingOnly || comment.trim().length >= 100) {
-            const newReview = { 
-                id: Date.now().toString(), 
-                story_id: storyId,
-                user_id: 'current_user',
-                user_avatar: localStorage.getItem('userData') ? JSON.parse(localStorage.getItem('userData')).avatar_url : null,
-                username: localStorage.getItem('userData') ? JSON.parse(localStorage.getItem('userData')).username : 'Khách',
-                rating: rating,
-                content: isRatingOnly ? '' : comment,
-                created_at: new Date().toISOString(),
-                is_rating_only: isRatingOnly
-            };
-            
-            setReviews([newReview, ...reviews]);
-            setComment('');
-            setRating(0);
-            
-            // In a real app, you would send this to an API
-            console.log('New review:', newReview);
-        } else {
-            alert('Bài đánh giá cần có ít nhất 100 từ hoặc chỉ chấm điểm.');
+    if (diffInSeconds < 60) return `${diffInSeconds} giây trước`;
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) return `${diffInMinutes} phút trước`;
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours} giờ trước`;
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 30) return `${diffInDays} ngày trước`;
+
+    const diffInMonths = Math.floor(diffInDays / 30);
+    if (diffInMonths < 12) return `${diffInMonths} tháng trước`;
+
+    const diffInYears = Math.floor(diffInMonths / 12);
+    return `${diffInYears} năm trước`;
+  };
+
+  // Tải dữ liệu khi mount hoặc storyId thay đổi
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setIsLoading(true);
+        setErrorMsg(null);
+
+        // 1. Fetch ratings từ API
+        const apiReviews = await fetchRatings(storyId);
+        const mappedReviews = apiReviews.map((r) => ({
+          id: r.id,
+          username: r.userName,
+          user_avatar: null,
+          rating: r.score,
+          content: r.review,
+          created_at: r.createdAt,
+          is_rating_only: false,
+        }));
+        setReviews(mappedReviews);
+
+        // 2. Fetch chapters từ API
+        try {
+          const chaptersData = await fetchAllChapter(storyId);
+
+          // Map và sắp xếp chapters
+          if (chaptersData && Array.isArray(chaptersData)) {
+            const sortedChapters = chaptersData
+              .sort((a, b) => a.chapterNumber - b.chapterNumber)
+              .map((chapter) => ({
+                id: chapter.id,
+                number: chapter.chapterNumber,
+                title: chapter.title.replace(/^Chương \d+:\s*/, ""), // Xóa tiền tố "Chương X: " nếu có
+                createdAt: chapter.createdAt,
+                views: chapter.views,
+                timeAgo: formatTimeAgo
+                  ? formatTimeAgo(new Date(chapter.createdAt))
+                  : new Date(chapter.createdAt).toLocaleDateString(),
+              }));
+            setChapters(sortedChapters);
+          } else {
+            console.error("Invalid chapters data returned:", chaptersData);
+            setChapters([]);
+          }
+        } catch (chapterError) {
+          console.error("Error fetching chapters:", chapterError);
+          setChapters([]);
         }
-    };
 
-    const handleAddComment = () => {
-        if (newComment.trim()) {
-            const newCommentObj = {
-                id: Date.now().toString(),
-                story_id: storyId,
-                user_id: 'current_user',
-                user_avatar: localStorage.getItem('userData') ? JSON.parse(localStorage.getItem('userData')).avatar_url : null,
-                username: localStorage.getItem('userData') ? JSON.parse(localStorage.getItem('userData')).username : 'Khách',
-                content: newComment,
-                created_at: new Date().toISOString(),
-                likes: 0,
-                replies: []
-            };
-            
-            setComments([newCommentObj, ...comments]);
-            setNewComment('');
-            
-            // In a real app, you would send this to an API
-            console.log('New comment:', newCommentObj);
-        }
-    };
-
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('vi-VN', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
-
-    // Show loading state
-    if (isLoading) {
-        return (
-            <div className="comment-section loading">
-                <div className="comment-tabs">
-                    <button className={activeTab === 'review' ? 'active' : ''}>Đánh giá</button>
-                    <button className={activeTab === 'comment' ? 'active' : ''}>Thảo luận</button>
-                </div>
-                <div className="loading-message">Đang tải bình luận...</div>
-            </div>
-        );
+        // 3. Fetch comments từ API cho tất cả hoặc chapter cụ thể
+        await loadComments();
+      } catch (err) {
+        console.error(err);
+        setErrorMsg("Không thể tải dữ liệu. Vui lòng thử lại.");
+      } finally {
+        setIsLoading(false);
+      }
     }
 
-    // Show error state
-    if (error) {
-        return (
-            <div className="comment-section error">
-                <div className="comment-tabs">
-                    <button className={activeTab === 'review' ? 'active' : ''}>Đánh giá</button>
-                    <button className={activeTab === 'comment' ? 'active' : ''}>Thảo luận</button>
-                </div>
-                <div className="error-message">{error}</div>
-            </div>
-        );
+    loadData();
+  }, [storyId]);
+
+  // Tải comments dựa trên chapter đã chọn
+  const loadComments = async () => {
+    try {
+      const apiComments = await fetchComments(storyId, selectedChapterId);
+      const mappedComments = apiComments.map((c) => ({
+        id: c.id,
+        username: c.userName,
+        user_avatar: null,
+        content: c.content,
+        created_at: c.createdAt,
+        chapter_id: c.chapterId,
+        chapter_title: c.chapterTitle, // Nếu API trả về title của chapter
+      }));
+      setComments(mappedComments);
+    } catch (err) {
+      console.error("Error loading comments:", err);
+      setErrorMsg("Không thể tải bình luận. Vui lòng thử lại.");
     }
+  };
 
-    return (
-        <div className="comment-section">
-            <div className="comment-tabs">
-                <button
-                    className={activeTab === 'review' ? 'active' : ''}
-                    onClick={() => setActiveTab('review')}
-                >
-                    Đánh giá ({reviews.length})
-                </button>
-                <button
-                    className={activeTab === 'comment' ? 'active' : ''}
-                    onClick={() => setActiveTab('comment')}
-                >
-                    Thảo luận ({comments.length})
-                </button>
-            </div>
+  // Tải lại comments khi chapter được chọn thay đổi
+  useEffect(() => {
+    if (activeTab === "comment") {
+      loadComments();
+    }
+  }, [selectedChapterId, activeTab]);
 
-            {activeTab === 'review' && (
-                <div className="reviews-container">
-                    <div className="comment-form">
-                        <h2>Chấm điểm nội dung truyện: {rating} điểm</h2>
-                        <div className="rating-slider">
-                            <input
-                                type="range"
-                                min="0"
-                                max="5"
-                                step="0.1"
-                                value={rating}
-                                onChange={handleRatingChange}
-                            />
-                            <div className="rating-display">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                    <FaStar 
-                                        key={star} 
-                                        className={rating >= star ? "star-filled" : "star-empty"} 
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                        <label className="rating-only-checkbox">
-                            <input 
-                                type="checkbox" 
-                                checked={isRatingOnly}
-                                onChange={() => setIsRatingOnly(!isRatingOnly)}
-                            />
-                            Tôi chỉ muốn chấm điểm (không viết đánh giá)
-                        </label>
-                        
-                        {!isRatingOnly && (
-                            <>
-                                <input type="text" placeholder="Nhân vật chính như nào? (nhiệt huyết, vì sĩ, thông minh?...)" />
-                                <input type="text" placeholder="Cốt truyện như nào? (logic, sảng văn, bố cục nhiều lớp, quay xe liên tục?...)" />
-                                <input type="text" placeholder="Bố cục thế giới như nào? (lớn hay nhỏ, một thế giới, nhiều thế giới, nhiều tầng?...)" />
-                                <textarea
-                                    placeholder="Nội dung bài đánh giá (ít nhất 100 từ)..."
-                                    value={comment}
-                                    onChange={(e) => setComment(e.target.value)}
-                                />
-                            </>
-                        )}
-                        
-                        <button 
-                            className="submit-review-btn"
-                            onClick={handleSubmitReview}
-                            disabled={!isRatingOnly && comment.length < 100}
-                        >
-                            GỬI ĐÁNH GIÁ
-                        </button>
-                        
-                        <div className="comment-notice">
-                            <p>- Từ phiên bản mới, các bài đánh giá có nội dung sẽ được duyệt đọc trước khi được hiển thị.</p>
-                            <p>- Nếu bạn chỉ muốn chấm điểm cho truyện, hãy tích vào "Tôi chỉ muốn chấm điểm".</p>
-                            <p>- Vui lòng đọc kỹ Điều khoản dịch vụ và Hướng dẫn sử dụng trước khi viết đánh giá.</p>
-                        </div>
-                    </div>
+  // Thao tác gửi đánh giá mới
+  const handleSubmitReview = async () => {
+    if (!isRatingOnly && reviewText.trim().length < 100) {
+      alert('Bài đánh giá cần ít nhất 50 từ hoặc tick "chỉ chấm điểm".');
+      return;
+    }
+    try {
+      // 1) Gọi API lưu rating
+      const saved = await postRating(
+        storyId,
+        ratingValue,
+        isRatingOnly ? "" : reviewText
+      );
 
-                    {reviews.length > 0 ? (
-                        <div className="review-list">
-                            {reviews.map((review) => (
-                                <div key={review.id} className="review-item">
-                                    <div className="review-header">
-                                        <div className="reviewer-info">
-                                            {review.user_avatar ? (
-                                                <img 
-                                                    src={review.user_avatar} 
-                                                    alt={review.username || 'Người dùng'} 
-                                                    className="user-avatar" 
-                                                />
-                                            ) : (
-                                                <FaUserCircle className="default-avatar" />
-                                            )}
-                                            <div className="user-details">
-                                                <span className="username">{review.username || 'Người dùng ẩn danh'}</span>
-                                                <span className="review-date">{formatDate(review.created_at)}</span>
-                                            </div>
-                                        </div>
-                                        <div className="review-rating">
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <FaStar 
-                                                    key={star} 
-                                                    className={review.rating >= star ? "star-filled" : "star-empty"} 
-                                                />
-                                            ))}
-                                            <span className="rating-value">{review.rating}/5</span>
-                                        </div>
-                                    </div>
-                                    
-                                    {review.content && !review.is_rating_only && (
-                                        <div className="review-content">
-                                            <p>{review.content}</p>
-                                        </div>
-                                    )}
-                                    
-                                    <div className="review-footer">
-                                        <button className="like-button">Hữu ích</button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="empty-state">
-                            <p>Chưa có đánh giá nào cho truyện này.</p>
-                            <p>Hãy là người đầu tiên đánh giá!</p>
-                        </div>
-                    )}
-                </div>
-            )}
+      // 2) Map response và thêm vào state để hiển thị ngay
+      const newRev = {
+        id: saved.id,
+        username: saved.userName,
+        user_avatar: null,
+        rating: saved.score,
+        content: saved.review,
+        created_at: saved.createdAt,
+        is_rating_only: false,
+      };
+      setReviews([newRev, ...reviews]);
 
-            {activeTab === 'comment' && (
-                <div className="comments-container">
-                    <div className="comment-input">
-                        <textarea
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            placeholder="Viết bình luận..."
-                        />
-                        <button 
-                            onClick={handleAddComment}
-                            disabled={!newComment.trim()}
-                            className="comment-submit-btn"
-                        >
-                            Gửi
-                        </button>
-                    </div>
+      // 3) Reset form
+      setRatingValue(0);
+      setReviewText("");
+      setIsRatingOnly(false);
+    } catch (err) {
+      console.error(err);
+      alert("Gửi đánh giá thất bại. Vui lòng thử lại.");
+    }
+  };
 
-                    {comments.length > 0 ? (
-                        <div className="comment-list">
-                            {comments.map((commentItem) => (
-                                <div key={commentItem.id} className="comment-item">
-                                    <div className="comment-header">
-                                        <div className="commenter-info">
-                                            {commentItem.user_avatar ? (
-                                                <img 
-                                                    src={commentItem.user_avatar} 
-                                                    alt={commentItem.username || 'Người dùng'} 
-                                                    className="user-avatar" 
-                                                />
-                                            ) : (
-                                                <FaUserCircle className="default-avatar" />
-                                            )}
-                                            <div className="user-details">
-                                                <span className="username">{commentItem.username || 'Người dùng ẩn danh'}</span>
-                                                <span className="comment-date">{formatDate(commentItem.created_at)}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p className="comment-text">{commentItem.content}</p>
-                                    <div className="comment-actions">
-                                        <button className="like-button">
-                                            Thích ({commentItem.likes || 0})
-                                        </button>
-                                        <button className="reply-button">
-                                            Trả lời
-                                        </button>
-                                    </div>
-                                    
-                                    {commentItem.replies && commentItem.replies.length > 0 && (
-                                        <div className="comment-replies">
-                                            {commentItem.replies.map(reply => (
-                                                <div key={reply.id} className="reply-item">
-                                                    <div className="reply-header">
-                                                        <div className="replier-info">
-                                                            {reply.user_avatar ? (
-                                                                <img 
-                                                                    src={reply.user_avatar} 
-                                                                    alt={reply.username || 'Người dùng'} 
-                                                                    className="user-avatar small" 
-                                                                />
-                                                            ) : (
-                                                                <FaUserCircle className="default-avatar small" />
-                                                            )}
-                                                            <div className="user-details">
-                                                                <span className="username">{reply.username || 'Người dùng ẩn danh'}</span>
-                                                                <span className="reply-date">{formatDate(reply.created_at)}</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <p className="reply-text">{reply.content}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="empty-state">
-                            <p>Chưa có bình luận nào cho truyện này.</p>
-                            <p>Hãy là người đầu tiên bình luận!</p>
-                        </div>
-                    )}
-                </div>
-            )}
-        </div>
-    );
+  // Thao tác gửi bình luận mới
+  const handleSubmitComment = async () => {
+    const text = newCommentText.trim();
+    if (!text) return;
+
+    try {
+      // 1) Gọi API POST comment với chapterId nếu có
+      const saved = await postComment(
+        storyId,
+        text,
+        selectedChapterId, // Truyền chapterId được chọn
+        null // parentCommentId nếu là reply
+      );
+
+      // 2) Map response thành object phù hợp DiscussionSection
+      const newCmt = {
+        id: saved.id,
+        username: saved.userName,
+        user_avatar: null,
+        content: saved.content,
+        created_at: saved.createdAt,
+        chapter_id: saved.chapterId,
+        chapter_title: saved.chapterTitle,
+      };
+
+      // 3) Đẩy comment mới lên đầu danh sách
+      setComments([newCmt, ...comments]);
+      setNewCommentText("");
+    } catch (err) {
+      console.error(err);
+      alert("Gửi bình luận thất bại. Vui lòng thử lại.");
+    }
+  };
+
+  // Xử lý thay đổi chapter đã chọn
+  const handleChapterChange = (chapterId) => {
+    setSelectedChapterId(chapterId);
+  };
+
+  if (isLoading) {
+    return <div className="loading-message">Đang tải...</div>;
+  }
+  if (errorMsg) {
+    return <div className="error-message">{errorMsg}</div>;
+  }
+
+  return (
+    <div className="comment-section">
+      <div className="comment-tabs">
+        <button
+          className={activeTab === "review" ? "active" : ""}
+          onClick={() => setActiveTab("review")}
+        >
+          Đánh giá ({reviews.length})
+        </button>
+        <button
+          className={activeTab === "comment" ? "active" : ""}
+          onClick={() => setActiveTab("comment")}
+        >
+          Thảo luận ({comments.length})
+        </button>
+      </div>
+
+      {activeTab === "review" ? (
+        <ReviewSection
+          reviews={reviews}
+          rating={ratingValue}
+          onRatingChange={setRatingValue}
+          comment={reviewText}
+          onCommentChange={setReviewText}
+          isRatingOnly={isRatingOnly}
+          onToggleRatingOnly={() => setIsRatingOnly((v) => !v)}
+          onSubmitReview={handleSubmitReview}
+          formatDate={formatDate}
+        />
+      ) : (
+        <DiscussionSection
+          comments={comments}
+          newComment={newCommentText}
+          onNewCommentChange={setNewCommentText}
+          onSubmitComment={handleSubmitComment}
+          formatDate={formatDate}
+          chapters={chapters}
+          selectedChapterId={selectedChapterId}
+          onChapterChange={handleChapterChange}
+        />
+      )}
+    </div>
+  );
 }
-
-export default CommentSection;

@@ -1,115 +1,90 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaSearch, FaUserCircle } from 'react-icons/fa';
-import logo from '../../assets/img/logo.png';
-import './Header.scss';
-import AuthModal from '../Auth/LoginModal';
-import UserMenu from './UserMenu/UserMenu';
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaSearch } from "react-icons/fa";
+// import logo from "../../assets/img/logo.png";
+import logo1 from "../../assets/img/logo1.webp";
+
+import "./Header.scss";
+import AuthModal from "../Auth/AuthModal";
+import UserMenu from "./UserMenu/UserMenu";
+import { useAuth } from "../../apis/authContext";
+import { fetchStories } from "../../apis/storyServices";
 
 function Header() {
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+  const { currentUser, isAuthenticated, logout } = useAuth();
   const [isSearchVisible, setIsSearchVisible] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [initialAuthMode, setInitialAuthMode] = useState('login');
-  
+  const [initialAuthMode, setInitialAuthMode] = useState("login");
+  const searchInputRef = useRef(null);
+  const searchContainerRef = useRef(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    checkUserLoginStatus();
-  }, []);
-  
- 
-  const logout = () => {
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('userData');
-    setIsLoggedIn(false);
-    setUser(null);
-  };
-  
-  const checkUserLoginStatus = () => {
-    const userToken = localStorage.getItem('userToken');
-    if (userToken) {
-      const userData = localStorage.getItem('userData');
-      if (userData) {
-        setUser(JSON.parse(userData));
-        setIsLoggedIn(true);
-      } else {
-        
-        fetchUserData();
-      }
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    if (value.trim()) {
+      setIsLoading(true);
+      performSearch(value);
     } else {
-      setIsLoggedIn(false);
-      setUser(null);
+      setSearchResults([]);
     }
   };
-  
-  const fetchUserData = async () => {
+
+  // Perform search without debounce
+  const performSearch = async (query) => {
     try {
-      const userId = localStorage.getItem('userId');
-      if (!userId) {
-        logout();
-        return;
-      }
-      
-      try {
-      
-        const response = await fetch('/data/users.json');
-        if (!response.ok) throw new Error('Failed to fetch user data');
-        
-        const data = await response.json();
-        const userData = data.users.find(u => u.id === userId);
-        
-        if (!userData) {
-          logout();
-          return;
-        }
-        
-        const { password, ...safeUserData } = userData;
-        
-    
-        if (!safeUserData.display_name && safeUserData.displayName) {
-          safeUserData.display_name = safeUserData.displayName;
-        }
-        
-        if (!safeUserData.avatar_url && safeUserData.avatar) {
-          safeUserData.avatar_url = safeUserData.avatar;
-        }
-        
-   
-        localStorage.setItem('userData', JSON.stringify(safeUserData));
-        setUser(safeUserData);
-        setIsLoggedIn(true);
-      } catch (error) {
-        console.warn('Failed to fetch from API, trying localStorage');
-        const userData = localStorage.getItem('userData');
-        if (userData) {
-          setUser(JSON.parse(userData));
-          setIsLoggedIn(true);
-        } else {
-          logout();
-        }
-      }
+      const results = await fetchStories(query);
+      setSearchResults(results);
     } catch (error) {
-      console.error('Failed to fetch user data:', error);
-      logout();
+      console.error("Search error:", error);
+      setSearchResults([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSearchSubmit = (event) => {
-    if (event.key === 'Enter' && searchTerm.trim()) {
-      setIsSearchVisible(false);
+    if (event.key === "Enter" && searchTerm.trim()) {
       navigate(`/tim-kiem?q=${encodeURIComponent(searchTerm.trim())}`);
-      setSearchTerm('');
+      setIsSearchVisible(false);
+      setSearchResults([]);
+      setSearchTerm("");
     }
   };
 
+  // Close search results when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target)
+      ) {
+        setIsSearchVisible(false);
+        setSearchResults([]);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Focus input when search becomes visible
+  useEffect(() => {
+    if (isSearchVisible && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isSearchVisible]);
+
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   const openAuthModal = (mode) => () => {
@@ -119,62 +94,125 @@ function Header() {
 
   const handleAuthSuccess = (userData) => {
     setIsAuthModalOpen(false);
-    setUser(userData);
-    setIsLoggedIn(true);
+  };
+
+  // Navigate to story details when clicking on a search result
+  const handleResultClick = (story) => {
+    navigate(`/story/${story.id}`);
+    setIsSearchVisible(false);
+    setSearchResults([]);
+    setSearchTerm("");
   };
 
   return (
     <header className="site-header">
       <div className="header-container">
         <div className="header-search">
-          <button
-            className="search-icon-btn"
-            onClick={() => setIsSearchVisible(!isSearchVisible)}
-            aria-label="Tìm kiếm"
-          >
-            <FaSearch />
-          </button>
-          {isSearchVisible && (
-            <input
-              type="search"
-              placeholder="Tìm truyện..."
-              className="search-input"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={handleSearchSubmit}
-              autoFocus
-            />
-          )}
+          <div className="search-container" ref={searchContainerRef}>
+            <button
+              className="search-icon-btn"
+              onClick={() => setIsSearchVisible(!isSearchVisible)}
+              aria-label="Tìm kiếm"
+            >
+              <FaSearch />
+            </button>
+            {isSearchVisible && (
+              <input
+                ref={searchInputRef}
+                type="search"
+                placeholder="Tìm truyện..."
+                className="search-input"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                onKeyDown={handleSearchSubmit}
+              />
+            )}
+
+            {/* Search Results Display - Outside of conditional rendering for input */}
+            {isSearchVisible && searchTerm.trim() && (
+              <div className="search-results-container">
+                {isLoading ? (
+                  <div className="search-loading">Đang tìm kiếm...</div>
+                ) : searchResults.length > 0 ? (
+                  <ul className="search-results-list">
+                    {searchResults.map((story) => (
+                      <li
+                        key={story._id || story.id}
+                        onClick={() => handleResultClick(story)}
+                      >
+                        <div className="search-result-item">
+                          {story.coverImage && (
+                            <img
+                              src={story.coverImage}
+                              alt={story.title}
+                              className="search-result-image"
+                            />
+                          )}
+                          <div className="search-result-info">
+                            <h4 className="search-result-title">
+                              {story.title}
+                            </h4>
+                            {story.author && (
+                              <p className="search-result-author">
+                                {story.author}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="search-no-results">
+                    Không tìm thấy kết quả
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="header-logo">
           <Link to="/">
-            <img src={logo} alt="Logo Website" style={{ height: '40px', display: 'block' }} />
+            <img
+              src={logo1}
+              alt="Logo Website"
+              style={{ height: "50px", display: "block" }}
+            />
           </Link>
         </div>
 
         <div className="header-user-actions">
-          {isLoggedIn && user ? (
-            <UserMenu user={user} onLogout={handleLogout} />
+          {isAuthenticated && currentUser ? (
+            <UserMenu user={currentUser} onLogout={handleLogout} />
           ) : (
             <div className="auth-links">
-              <button className="btn auth-btn login-btn" onClick={openAuthModal('login')}>
+              <button
+                className="btn auth-btn login-btn"
+                onClick={openAuthModal("login")}
+              >
                 Đăng nhập
               </button>
-              <button className="btn auth-btn register-btn" onClick={openAuthModal('register')}>
+              <button
+                className="btn auth-btn register-btn"
+                onClick={openAuthModal("register")}
+              >
                 Đăng ký
               </button>
             </div>
           )}
         </div>
       </div>
-      
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)}
-        onAuthSuccess={handleAuthSuccess}
-        initialMode={initialAuthMode}
-      />
+
+      {/* Only show the Auth Modal if not authenticated */}
+      {!isAuthenticated && (
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          onAuthSuccess={handleAuthSuccess}
+          initialMode={initialAuthMode}
+        />
+      )}
     </header>
   );
 }

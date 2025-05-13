@@ -1,556 +1,186 @@
-// ChapterReaderPage.scss
-
-// Variables
-$background-color: #eae4d3; // Main background color
-$text-color: #000000;       // Black text color
-$border-color: #d4cdbf;     // Slightly darker than background for borders
-$button-color: #333333;     // Dark button color
-$button-text: #ffffff;      // White text for buttons
-
-// Apply styles to the header component within ChapterReaderPage
 .chapter-reader-page {
-  // Target the header directly
-  header, 
-  .header {
-    background-color: #eae4d3 !important;
-    transition: background-color 0.3s ease;
-
-    // If your header has any borders that need to match
-    border-bottom-color: #d6ceb8 !important;
-  }
-  
-  // Target any nav elements in the header if needed
-  nav.navbar {
-    background-color: #eae4d3 !important;
-  }
-
-  // If you have any container inside the header
-  .header-container {
-    background-color: #eae4d3 !important;
-  }
-
-  // The rest of your existing styles...
+    /* max-width: 1200px; */
+    margin: 0 auto;
+    padding: 0 150px;
 }
 
-.chapter-reader-page {
-  background-color: $background-color;
-  color: $text-color;
-//   min-height: 100vh;
-//   padding: 2rem 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  
-  .reader-header {
-    background-color: $background-color;
+/* Header Styles */
+.reader-header {
+    padding: 20px 0;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 30px;
+}
+
+.story-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    text-transform: capitalize;
+}
+
+.chapter-title {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+/* Action Buttons */
+.reader-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.reader-actions button {
+    padding: 8px 15px;
+    border-radius: 4px;
+    background-color: #f3f3f3;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.reader-actions button:hover:not(:disabled) {
+    background-color: #e9e9e9;
+}
+
+.reader-actions button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.nav-button {
+    min-width: 130px;
+}
+
+.prev-button {
+    justify-content: flex-start;
+}
+
+.next-button {
+    justify-content: flex-end;
+}
+
+/* Dropdown Styles */
+.chapter-dropdown-container {
+    position: relative;
+    z-index: 100;
+}
+
+.dropdown-button {
+    position: relative;
+    min-width: 160px;
+}
+
+.dropdown-arrow {
+    transition: transform 0.2s ease;
+}
+
+.dropdown-arrow.open {
+    transform: rotate(180deg);
+}
+
+.chapters-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.chapters-list {
+    padding: 10px 0;
+}
+
+.chapter-item {
+    padding: 8px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f3f3f3;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.chapter-item:hover {
+    background-color: #f9f9f9;
+}
+
+.chapter-item.active {
+    background-color: #f0f0f0;
+    font-weight: 600;
+}
+
+.chapter-number {
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 3px;
+}
+
+.chapter-item-title {
+    font-size: 14px;
+}
+
+/* Reader Content */
+.reader-content {
+    max-width: 800px;
+    margin: 0 auto 40px;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    min-height: 500px;
+}
+
+.chapter-content {
+    line-height: 1.8;
+}
+
+.chapter-content p {
+    margin-bottom: 1em;
+    white-space: pre-wrap;   /* giữ khoảng trắng và xuống dòng */
+    word-break: break-word; 
+}
+
+/* Loading and Error States */
+.loading, .error-message {
     text-align: center;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    // border-radius: 0.25rem;
-    // border: 1px solid $border-color;
-    
-    h2 {
-      font-size: 1.8rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: $text-color;
-    }
-    
-    h3 {
-      font-size: 1.4rem;
-      font-weight: 500;
-      margin-bottom: 1.5rem;
-      color: $text-color;
-    }
-    
-    .reader-actions {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        margin: 1rem 0;
-        padding: 0.5rem 0;
-        // background-color: #f8f5ee;
-        border-top: 1px solid #e5e0d5;
-        border-bottom: 1px solid #e5e0d5;
-        
-        .btn-reader {
-          background-color: #f2ece0;
-          color: #8a7e6d;
-          border: 1px solid #d6cebd;
-          border-radius: 4px;
-          padding: 0.5rem 1rem;
-          margin: 0 0.5rem;
-          font-size: 0.9rem;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          display: flex;
-          align-items: center;
-          
-          &:hover, &:focus {
-            background-color: #e8e0d0;
-            color: #6b5c45;
-          }
-          
-          &:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-          }
-          
-          .mr-1 {
-            margin-right: 0.5rem;
-          }
-          
-          .ml-1 {
-            margin-left: 0.5rem;
-          }
-        }
-      }
-  }
-  
-  .reader-content {
-    background-color: $background-color;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    // border-radius: 0.25rem;
-    // border: 1px solid $border-color;
-    
-    .loading-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 3rem 0;
-      
-      .loading-spinner {
-        width: 3rem;
-        height: 3rem;
-        border: 5px solid rgba($text-color, 0.2);
-        border-top: 5px solid $text-color;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-bottom: 1rem;
-      }
-      
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-    }
-    
-    .chapter-text {
-    //   line-height: 1.8;
-    //   font-size: 1.125rem;
-      color: $text-color;
-      
-      p {
-        margin-bottom: 1.5rem;
-        text-align: justify;
-      }
-      
-      br {
-        display: block;
-        content: "";
-        margin-top: 0.5rem; // Add some space between sentences
-      }
-    }
-  }
-  
-  .reader-footer {
-    background-color: $background-color;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    border-radius: 0.25rem;
-    // border: 1px solid $border-color;
-    
-    .reader-actions {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin: 1.5rem 0;
-    }
-    .btn-reader {
-        display: flex;
-        align-items: center;
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        
-        &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .ml-1 {
-            margin-left: 0.25rem;
-        }
-        
-        .mr-1 {
-            margin-right: 0.25rem;
-        }
-    }
-    .btn-settings {
-        background-color: #4b6584;
-        color: white;
-        
-        &:hover {
-            background-color: #3a5070;
-        }
-    }
-    
-    .loading-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 200px;
-        
-        .loading-spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            border-top: 4px solid #3498db;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 1rem;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    }
-    
-  }
-  .settings-popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    
-    .settings-popup-content {
-        background-color: #e4dece;
-        border-radius: 8px;
-        width: 90%;
-        max-width: 500px;
-        max-height: 90%;
-        overflow-y: auto;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        position: fixed;
-    }
-    
-    .settings-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        border-bottom: 1px solid #ddd;
-        position: sticky;
-        top: 0;
-        background-color: #e4dece;
-        
-        h3 {
-            margin: 0;
-            font-size: 1.25rem;
-        }
-        
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: #333;
-            
-            &:hover {
-                color: #000;
-            }
-        }
-    }
-    
-    .settings-body {
-        padding: 1rem;
-    }
-    
-    .setting-item {
-        margin-bottom: 1.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        
-        label {
-            flex: 0 0 40%;
-            font-weight: 500;
-            font-size: 1rem;
-        }
-        
-        .setting-control {
-            flex: 0 0 60%;
-            
-            input[type="color"] {
-                width: 100%;
-                height: 2.5rem;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                cursor: pointer;
-            }
-            
-            &.dropdown {
-                select {
-                    width: 100%;
-                    padding: 0.5rem;
-                    border: 1px solid #ccc;
-                    border-radius: 4px;
-                    background-color: white;
-                    font-size: 1rem;
-                    height: 2.5rem;
-                    appearance: menulist;
-                }
-            }
-        }
-        
-        &.reset-container {
-            justify-content: center;
-            margin-top: 2rem;
-        }
-        
-        .reset-btn {
-            padding: 0.5rem 1.5rem;
-            background-color: white;
-            color: #333;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-weight: 500;
-            cursor: pointer;
-            font-size: 0.9rem;
-            
-            &:hover {
-                background-color: #f5f5f5;
-            }
-        }
-    }
+    padding: 40px 0;
+    color: #777;
 }
 
-// Add this code to prevent body scrolling when modal is open
-body.modal-open {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-}
-  
-  // Comment section styling
-  .comment-section {
-    background-color: $background-color;
-    padding: 1.5rem;
-    border-radius: 0.25rem;
-    border: 1px solid $border-color;
-    
-    h3 {
-      font-size: 1.4rem;
-      color: $text-color;
-      margin-bottom: 1.5rem;
-      border-bottom: 1px solid $border-color;
-      padding-bottom: 0.75rem;
-    }
-    
-    .comment-form {
-      margin-bottom: 2rem;
-      
-      textarea {
-        border: 1px solid $border-color;
-        border-radius: 0.25rem;
-        padding: 0.75rem;
-        margin-bottom: 1rem;
-        width: 100%;
-        background-color: lighten($background-color, 3%);
-        color: $text-color;
-        
-        &:focus {
-          border-color: darken($border-color, 15%);
-          box-shadow: 0 0 0 0.2rem rgba($button-color, 0.15);
-        }
-      }
-      
-      .btn-primary {
-        background-color: $button-color;
-        border-color: $button-color;
-        color: $button-text;
-        
-        &:hover {
-          background-color: lighten($button-color, 10%);
-          border-color: lighten($button-color, 10%);
-        }
-      }
-    }
-    
-    .comment-list {
-      .comment-item {
-        border-bottom: 1px solid $border-color;
-        padding: 1rem 0;
-        
-        &:last-child {
-          border-bottom: none;
-        }
-        
-        .comment-header {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 0.5rem;
-          
-          .user-info {
-            font-weight: 500;
-            color: $text-color;
-          }
-          
-          .comment-date {
-            font-size: 0.85rem;
-            color: darken($text-color, 20%);
-          }
-        }
-        
-        .comment-content {
-          margin-bottom: 0.5rem;
-          color: $text-color;
-        }
-        
-        .comment-actions {
-          display: flex;
-          gap: 1rem;
-          font-size: 0.9rem;
-          
-          a {
-            color: darken($text-color, 25%);
-            text-decoration: none;
-            
-            &:hover {
-              color: $button-color;
-            }
-          }
-        }
-      }
-    }
-  }
-  
-  // Reading settings panel styling
-  .reading-settings-panel {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 300px;
-    height: 100vh;
-    background-color: $background-color;
-    padding: 1.5rem;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    transform: translateX(0);
-    transition: transform 0.3s ease;
-    color: $text-color;
-    border-left: 1px solid $border-color;
-    
-    &.hidden {
-      transform: translateX(100%);
-    }
-    
-    h3 {
-      font-size: 1.3rem;
-      color: $text-color;
-      margin-bottom: 1.5rem;
-      border-bottom: 1px solid $border-color;
-      padding-bottom: 0.75rem;
-    }
-    
-    .settings-group {
-      margin-bottom: 1.5rem;
-      
-      label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: $text-color;
-      }
-      
-      .form-control {
-        margin-bottom: 1rem;
-        background-color: lighten($background-color, 3%);
-        border-color: $border-color;
-        color: $text-color;
-        
-        &:focus {
-          border-color: darken($border-color, 15%);
-          box-shadow: 0 0 0 0.2rem rgba($button-color, 0.15);
-        }
-      }
-      
-      .form-control-range {
-        width: 100%;
-      }
-      
-      .btn {
-        background-color: $button-color;
-        border-color: $button-color;
-        color: $button-text;
-        
-        &:hover {
-          background-color: lighten($button-color, 10%);
-          border-color: lighten($button-color, 10%);
-        }
-      }
-    }
-    
-    .close-btn {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: $text-color;
-      
-      &:hover {
-        color: darken($text-color, 20%);
-      }
-    }
-  }
+.error-message {
+    color: #d32f2f;
 }
 
-// Responsive adjustments
+/* Footer */
+.reader-footer {
+    margin: 30px 0;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .chapter-reader-page {
-    padding: 1rem 0;
-    
-    .reader-header, 
-    .reader-content, 
-    .reader-footer, 
-    .comment-section {
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-    
     .reader-actions {
-      justify-content: center;
-      
-      .btn {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.9rem;
-      }
+        flex-direction: column;
+        align-items: stretch;
     }
     
-    .chapter-text {
-      font-size: 1rem;
+    .reader-actions button {
+        width: 100%;
     }
     
-    .reading-settings-panel {
-      width: 100%;
+    .chapters-dropdown {
+        width: 100%;
     }
-  }
 }

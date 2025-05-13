@@ -333,17 +333,19 @@
   .chapters-grid {
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
     overflow-x: auto;
     gap: 20px;
     padding: 10px 0;
     
     .chapter-item {
-        min-width: 300px;
+        // min-width: 300px;
         border-bottom: 1px solid #eaeaea;
         padding: 12px 8px;
         color: #8c6e19;
         display: flex;
         flex-direction: column;
+        
         text-decoration: none;
         
         &:hover {
